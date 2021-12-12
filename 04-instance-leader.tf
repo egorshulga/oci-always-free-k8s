@@ -15,8 +15,8 @@ resource "oci_core_instance" "leader" {
   }
 
   create_vnic_details {
-    assign_public_ip = true
-    subnet_id        = oci_core_subnet.vcn_public_subnet.id
+    assign_public_ip          = true
+    subnet_id                 = oci_core_subnet.vcn_public_subnet.id
     assign_private_dns_record = true
   }
 

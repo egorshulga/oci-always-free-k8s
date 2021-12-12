@@ -8,9 +8,9 @@ module "vcn" {
   create_internet_gateway = true
   # create_nat_gateway      = true
   # create_service_gateway  = true
-  vcn_cidrs               = ["10.0.0.0/16"]
-  vcn_dns_label           = "vcn"
-  vcn_name                = "vcn"
+  vcn_cidrs     = ["10.0.0.0/16"]
+  vcn_dns_label = "vcn"
+  vcn_name      = "vcn"
 }
 
 locals {
@@ -44,7 +44,7 @@ resource "oci_core_security_list" "public_security_list" {
   }
   ingress_security_rules {
     stateless   = false
-    source      = "10.0.0.0/16"
+    source      = "0.0.0.0/0"
     source_type = "CIDR_BLOCK"
     protocol    = local.TCP
     tcp_options {
