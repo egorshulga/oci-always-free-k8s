@@ -45,3 +45,20 @@ resource "oci_core_instance_pool" "worker_pool" {
     primary_subnet_id   = oci_core_subnet.vcn_public_subnet.id
   }
 }
+
+# data "oci_core_instance_pool_instances" "worker_pool_instances" {
+#   compartment_id = oci_identity_compartment.tf_compartment.id
+#   instance_pool_id = oci_core_instance_pool.worker_pool.id
+# }
+
+# data "oci_core_instance" "worker_pool_instance" {
+#   for_each = {
+#     for instance in data.oci_core_instance_pool_instances.worker_pool_instances.instances:
+#     instance.id => instance
+#   }
+#   instance_id = each.key
+# }
+
+# output "worker_pool_instances" {
+#   value = data.oci_core_instance.worker_pool_instance
+# }
