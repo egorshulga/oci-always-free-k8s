@@ -4,20 +4,21 @@ resource "oci_core_instance" "leader" {
 
   display_name = "leader"
 
-  shape = "VM.Standard.A1.Flex"
+  shape = "VM.Standard.E2.1.Micro"
   shape_config {
     ocpus         = 1
-    memory_in_gbs = 6
+    memory_in_gbs = 1
   }
   source_details {
     source_type = "image"
-    source_id   = data.oci_core_images.ubuntu_arm.images[0].id
+    source_id   = data.oci_core_images.ubuntu.images[0].id
   }
 
   create_vnic_details {
     assign_public_ip          = true
     subnet_id                 = oci_core_subnet.vcn_public_subnet.id
     assign_private_dns_record = true
+    hostname_label            = "leader"
   }
 
   metadata = {

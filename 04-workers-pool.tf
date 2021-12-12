@@ -21,8 +21,10 @@ resource "oci_core_instance_configuration" "worker_pool_configuration" {
       }
 
       create_vnic_details {
-        assign_public_ip = false
-        subnet_id        = oci_core_subnet.vcn_public_subnet.id
+        assign_public_ip          = false
+        subnet_id                 = oci_core_subnet.vcn_public_subnet.id
+        assign_private_dns_record = true
+        hostname_label            = "worker"
       }
 
       metadata = {

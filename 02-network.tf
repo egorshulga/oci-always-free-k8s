@@ -29,6 +29,7 @@ resource "oci_core_subnet" "vcn_public_subnet" {
   route_table_id    = module.vcn.ig_route_id
   security_list_ids = [oci_core_security_list.public_security_list.id]
   display_name      = "public-subnet"
+  dns_label         = "subnet"
 }
 
 resource "oci_core_security_list" "public_security_list" {
