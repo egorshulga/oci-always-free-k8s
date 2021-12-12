@@ -2,7 +2,7 @@ module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
   version = "3.1.0"
 
-  compartment_id = oci_identity_compartment.tf-compartment.id
+  compartment_id = oci_identity_compartment.tf_compartment.id
   region         = var.region
 
   create_internet_gateway = true
@@ -22,17 +22,17 @@ locals {
 
 # Public subnet
 
-resource "oci_core_subnet" "vcn-public-subnet" {
-  compartment_id    = oci_identity_compartment.tf-compartment.id
+resource "oci_core_subnet" "vcn_public_subnet" {
+  compartment_id    = oci_identity_compartment.tf_compartment.id
   vcn_id            = module.vcn.vcn_id
   cidr_block        = "10.0.0.0/24"
   route_table_id    = module.vcn.ig_route_id
-  security_list_ids = [oci_core_security_list.public-security-list.id]
+  security_list_ids = [oci_core_security_list.public_security_list.id]
   display_name      = "public-subnet"
 }
 
-resource "oci_core_security_list" "public-security-list" {
-  compartment_id = oci_identity_compartment.tf-compartment.id
+resource "oci_core_security_list" "public_security_list" {
+  compartment_id = oci_identity_compartment.tf_compartment.id
   vcn_id         = module.vcn.vcn_id
   display_name   = "Security List for Public subnet"
   # Default rules
@@ -77,8 +77,8 @@ resource "oci_core_security_list" "public-security-list" {
 
 # DHCP
 
-resource "oci_core_dhcp_options" "dhcp-options" {
-  compartment_id = oci_identity_compartment.tf-compartment.id
+resource "oci_core_dhcp_options" "dhcp_options" {
+  compartment_id = oci_identity_compartment.tf_compartment.id
   vcn_id         = module.vcn.vcn_id
   options {
     type        = "DomainNameServer"

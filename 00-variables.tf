@@ -9,7 +9,7 @@ variable "region" {
   nullable = false
 }
 
-variable "leader-ssh-key-pub" {
+variable "leader_ssh_key_pub" {
   type     = string
   nullable = false
 }

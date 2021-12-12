@@ -1,5 +1,5 @@
 resource "oci_core_instance" "worker-arm" {
-  compartment_id      = oci_identity_compartment.tf-compartment.id
+  compartment_id      = oci_identity_compartment.tf_compartment.id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
   display_name = "worker-arm"
@@ -16,17 +16,17 @@ resource "oci_core_instance" "worker-arm" {
 
   create_vnic_details {
     assign_public_ip = false
-    subnet_id        = oci_core_subnet.vcn-public-subnet.id
+    subnet_id        = oci_core_subnet.vcn_public_subnet.id
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.leader-ssh-key-pub)
+    ssh_authorized_keys = file(var.leader_ssh_key_pub)
   }
 }
 
 # Retrieve ID for the image
 resource "oci_core_instance" "worker" {
-  compartment_id      = oci_identity_compartment.tf-compartment.id
+  compartment_id      = oci_identity_compartment.tf_compartment.id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
   display_name = "worker"
@@ -43,10 +43,10 @@ resource "oci_core_instance" "worker" {
 
   create_vnic_details {
     assign_public_ip = false
-    subnet_id        = oci_core_subnet.vcn-public-subnet.id
+    subnet_id        = oci_core_subnet.vcn_public_subnet.id
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.leader-ssh-key-pub)
+    ssh_authorized_keys = file(var.leader_ssh_key_pub)
   }
 }
