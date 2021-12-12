@@ -1,14 +1,3 @@
-# Availability domain is required for compute instances
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = oci_identity_compartment.tf-compartment.id
-}
-
-# Retrieve ID for the image
-data "oci_core_images" "ubuntu_arm" {
-  compartment_id = oci_identity_compartment.tf-compartment.id
-  display_name   = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
-}
-
 resource "oci_core_instance" "leader" {
   compartment_id      = oci_identity_compartment.tf-compartment.id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
