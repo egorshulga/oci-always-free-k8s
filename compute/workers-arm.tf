@@ -3,7 +3,7 @@ resource "oci_core_instance" "worker_arm" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
   display_name = "worker-arm"
-  count        = var.workers_arm_count
+  count        = var.workers_count
 
   shape = "VM.Standard.A1.Flex"
   shape_config {
@@ -19,7 +19,7 @@ resource "oci_core_instance" "worker_arm" {
     assign_public_ip          = false
     subnet_id                 = var.subnet_id
     assign_private_dns_record = true
-    hostname_label            = "worker-arm-${count.index}"
+    hostname_label            = "worker-${count.index}"
   }
 
   metadata = {

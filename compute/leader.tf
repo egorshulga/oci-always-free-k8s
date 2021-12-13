@@ -4,14 +4,14 @@ resource "oci_core_instance" "leader" {
 
   display_name = "leader"
 
-  shape = "VM.Standard.E2.1.Micro"
+  shape = "VM.Standard.A1.Flex"
   shape_config {
     ocpus         = 1
-    memory_in_gbs = 1
+    memory_in_gbs = 6
   }
   source_details {
     source_type = "image"
-    source_id   = data.oci_core_images.ubuntu.images[0].id
+    source_id   = data.oci_core_images.ubuntu_arm.images[0].id
   }
 
   create_vnic_details {
