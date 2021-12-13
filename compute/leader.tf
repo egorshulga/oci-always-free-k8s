@@ -23,6 +23,7 @@ resource "oci_core_instance" "leader" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_key_pub)
+    user_data           = base64encode(file("${path.module}/bootstrap/leader.sh"))
   }
 }
 

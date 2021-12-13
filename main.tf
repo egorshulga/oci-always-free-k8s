@@ -15,5 +15,5 @@ module "compute" {
   ssh_key_pub    = var.ssh_key_pub
   subnet_id      = module.network.subnet_id
 
-  workers_count = 2
+  workers_count = 0
 }
