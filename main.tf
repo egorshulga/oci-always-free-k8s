@@ -17,3 +17,11 @@ module "compute" {
 
   workers_count = 0
 }
+
+output "leader_ip" {
+  value = module.compute.leader_ip
+}
+
+output "leader" {
+  value = module.compute.leader
+}

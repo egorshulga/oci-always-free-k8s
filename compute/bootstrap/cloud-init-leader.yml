@@ -1,0 +1,17 @@
+write_files:
+  - content: ${reset-iptables}
+    encoding: gz+b64
+    path: /root/init/reset-iptables.bash
+  - content: ${install-kubeadm}
+    encoding: gz+b64
+    path: /root/init/install-kubeadm.bash
+
+package_update: true
+package_upgrade: true
+
+runcmd:
+  - echo 'Running leader cloud-init script'
+  - /root/init/reset-iptables.bash
+  - /root/init/install-kubeadm.bash
+  - echo 'Leader cloud-init script complete'
+  - echo 'It is a leader instance, which was provisioned by Terraform' >> /etc/motd
