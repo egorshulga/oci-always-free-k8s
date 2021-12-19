@@ -1,24 +1,29 @@
+data "oci_core_images" "leader" {
+  compartment_id = var.compartment_id
+  display_name   = var.leader.image
+}
+
 resource "oci_core_instance" "leader" {
   compartment_id      = var.compartment_id
   availability_domain = local.availability_domain
 
   display_name = "leader"
 
-  shape = "VM.Standard.A1.Flex"
+  shape = var.leader.shape
   shape_config {
-    ocpus         = 1
-    memory_in_gbs = 6
+    ocpus         = var.leader.ocpus
+    memory_in_gbs = var.leader.memory_in_gbs
   }
   source_details {
     source_type = "image"
-    source_id   = data.oci_core_images.ubuntu_arm.images[0].id
+    source_id   = data.oci_core_images.leader.images[0].id
   }
 
   create_vnic_details {
     assign_public_ip          = true
     subnet_id                 = var.subnet_id
     assign_private_dns_record = true
-    hostname_label            = "leader"
+    hostname_label            = var.leader.hostname
   }
 
   metadata = {

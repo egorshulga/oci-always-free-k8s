@@ -7,7 +7,7 @@ module "vcn" {
 
   create_internet_gateway = true
   vcn_cidrs               = ["10.0.0.0/16"]
-  vcn_dns_label           = "vcn"
+  vcn_dns_label           = var.vcn_dns_label
   vcn_name                = "vcn"
 }
 
@@ -29,7 +29,7 @@ resource "oci_core_subnet" "vcn_public_subnet" {
   route_table_id    = module.vcn.ig_route_id
   security_list_ids = [oci_core_security_list.public_security_list.id]
   display_name      = "public-subnet"
-  dns_label         = "subnet"
+  dns_label         = var.subnet_dns_label
 }
 
 resource "oci_core_security_list" "public_security_list" {
