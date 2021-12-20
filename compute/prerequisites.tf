@@ -21,9 +21,9 @@ locals {
 
 locals {
   script = {
-    reset-iptables  = file("${path.module}/bootstrap/scripts/reset-iptables.bash")
-    install-kubeadm = file("${path.module}/bootstrap/scripts/install-kubeadm.bash")
-    setup-control-plane = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.bash", {
+    reset-iptables  = file("${path.module}/bootstrap/scripts/reset-iptables.sh")
+    install-kubeadm = file("${path.module}/bootstrap/scripts/install-kubeadm.sh")
+    setup-control-plane = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
       leader-domain-name = local.leader_fqdn
     })
   }

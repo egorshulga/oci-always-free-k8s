@@ -36,10 +36,11 @@ data "template_cloudinit_config" "leader_cloud_init" {
   base64_encode = true
   gzip          = true
   part {
+    content_type = "text/cloud-config"
     content = templatefile("${path.module}/bootstrap/cloud-init-leader.yml", {
-      reset-iptables      = local.script.reset-iptables,
-      install-kubeadm     = local.script.install-kubeadm,
-      setup-control-plane = local.script.setup-control-plane,
+      reset-iptables      = base64encode(local.script.reset-iptables),
+      install-kubeadm     = base64encode(local.script.install-kubeadm),
+      setup-control-plane = base64encode(local.script.setup-control-plane),
     })
   }
 }
