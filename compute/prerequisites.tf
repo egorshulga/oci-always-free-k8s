@@ -19,21 +19,22 @@ locals {
   leader_fqdn = "${var.leader.hostname}.${data.oci_core_subnet.subnet.dns_label}.${data.oci_core_vcn.vcn.dns_label}.oraclevcn.com"
 }
 
+# module "kubeadm-token" {
+#   source = "github.com/scholzj/terraform-kubeadm-token"
+# }
+
 locals {
+  token = "1qqih3.vpeipt4judm83tov" # Predefined token, to avoid instances drop-and-reacreate when possible
   script = {
     reset-iptables  = file("${path.module}/bootstrap/scripts/reset-iptables.sh")
     install-kubeadm = file("${path.module}/bootstrap/scripts/install-kubeadm.sh")
     setup-control-plane = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
       leader-fqdn = local.leader_fqdn,
-      token       = module.kubeadm-token.token,
+      token       = local.token,
     })
     setup-worker = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
       leader-fqdn = local.leader_fqdn,
-      token       = module.kubeadm-token.token,
+      token       = local.token,
     })
   }
-}
-
-module "kubeadm-token" {
-  source = "github.com/scholzj/terraform-kubeadm-token"
 }
