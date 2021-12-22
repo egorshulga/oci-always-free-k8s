@@ -24,7 +24,16 @@ locals {
     reset-iptables  = file("${path.module}/bootstrap/scripts/reset-iptables.sh")
     install-kubeadm = file("${path.module}/bootstrap/scripts/install-kubeadm.sh")
     setup-control-plane = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
-      leader-domain-name = local.leader_fqdn
+      leader-fqdn = local.leader_fqdn,
+      token       = module.kubeadm-token.token,
+    })
+    setup-worker = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
+      leader-fqdn = local.leader_fqdn,
+      token       = module.kubeadm-token.token,
     })
   }
+}
+
+module "kubeadm-token" {
+  source = "github.com/scholzj/terraform-kubeadm-token"
 }

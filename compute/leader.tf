@@ -7,7 +7,7 @@ resource "oci_core_instance" "leader" {
   compartment_id      = var.compartment_id
   availability_domain = local.availability_domain
 
-  display_name = "leader"
+  display_name = var.leader.hostname
 
   shape = var.leader.shape
   shape_config {
@@ -28,19 +28,19 @@ resource "oci_core_instance" "leader" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_key_pub)
-    user_data           = data.template_cloudinit_config.leader_cloud_init.rendered
+    user_data           = data.template_cloudinit_config.leader.rendered
   }
 }
 
-data "template_cloudinit_config" "leader_cloud_init" {
+data "template_cloudinit_config" "leader" {
   base64_encode = true
   gzip          = true
   part {
     content_type = "text/cloud-config"
     content = templatefile("${path.module}/bootstrap/cloud-init-leader.yml", {
-      reset-iptables      = base64encode(local.script.reset-iptables),
-      install-kubeadm     = base64encode(local.script.install-kubeadm),
-      setup-control-plane = base64encode(local.script.setup-control-plane),
+      reset-iptables      = local.script.reset-iptables,
+      install-kubeadm     = local.script.install-kubeadm,
+      setup-control-plane = local.script.setup-control-plane,
     })
   }
 }

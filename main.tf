@@ -27,7 +27,7 @@ module "compute" {
     hostname      = "leader"
   }
   workers = {
-    count         = 0
+    count         = 1
     shape         = "VM.Standard.E2.1.Micro"
     image         = "Canonical-Ubuntu-20.04-2021.12.01-0"
     ocpus         = 1

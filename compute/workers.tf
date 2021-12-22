@@ -7,7 +7,7 @@ resource "oci_core_instance" "worker" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
-  display_name = "worker"
+  display_name = "${var.workers.base_hostname}-${count.index}"
   count        = var.workers.count
 
   shape = var.workers.shape
@@ -29,5 +29,19 @@ resource "oci_core_instance" "worker" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_key_pub)
+    user_data           = data.template_cloudinit_config.worker.rendered
+  }
+}
+
+data "template_cloudinit_config" "worker" {
+  base64_encode = true
+  gzip          = true
+  part {
+    content_type = "text/cloud-config"
+    content = templatefile("${path.module}/bootstrap/cloud-init-worker.yml", {
+      reset-iptables  = local.script.reset-iptables,
+      install-kubeadm = local.script.install-kubeadm,
+      setup-worker    = local.script.setup-worker,
+    })
   }
 }
