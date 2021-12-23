@@ -8,12 +8,13 @@ sudo kubeadm init \
   --pod-network-cidr=10.244.0.0/16 \
   --token=${token}
 
-USER=ubuntu
-
 # Prepare kube config
+USER=ubuntu
 mkdir -p /home/$USER/.kube
 sudo cp /etc/kubernetes/admin.conf /home/$USER/.kube/config
-sudo chown $(id -u):$(id -g) /home/$USER/.kube/config
+sudo chown $USER:$USER /home/$USER/.kube/config
+
+export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # Setup cluster network - Calico
 # kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
