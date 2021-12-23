@@ -48,3 +48,11 @@ output "leader_ip" {
 output "leader_fqdn" {
   value = module.compute.leader_fqdn
 }
+
+output "workers_private_ips" {
+  value = module.compute.workers_private_ips
+}
+
+output "scp-kube-config-command" {
+  value = "scp ubuntu@${module.compute.leader_ip}:.kube/config %USERPROFILE%/.kube/config"
+}
