@@ -55,11 +55,11 @@ resource "oci_core_instance" "leader" {
   }
   provisioner "file" {
     content     = local.script.reset-iptables
-    destination = "~/init/reset-iptables.sh"
+    destination = "/home/ubuntu/init/reset-iptables.sh"
   }
   provisioner "file" {
     content     = local.script.install-kubeadm
-    destination = "~/init/install-kubeadm.sh"
+    destination = "/home/ubuntu/init/install-kubeadm.sh"
   }
   provisioner "file" {
     content = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
@@ -67,13 +67,13 @@ resource "oci_core_instance" "leader" {
       token            = local.token,
       leader-public-ip = self.public_ip,
     })
-    destination = "~/init/setup-control-plane.sh"
+    destination = "/home/ubuntu/init/setup-control-plane.sh"
   }
   provisioner "remote-exec" {
     inline = [
       "echo 'Running leader cloud-init script'",
-      "sudo apt-get update -y",
-      "sudo apt-get upgrade -y",
+      "sudo apt-get update --yes",
+      "sudo apt-get upgrade --yes",
       "chmod 0777 ~/init/*",
       "~/init/reset-iptables.sh",
       "~/init/install-kubeadm.sh",
@@ -83,15 +83,3 @@ resource "oci_core_instance" "leader" {
     ]
   }
 }
-
-# data "template_cloudinit_config" "leader" {
-#   base64_encode = true
-#   gzip          = true
-#   part {
-#     content_type = "text/cloud-config"
-#     content = templatefile("${path.module}/bootstrap/cloud-init-leader.yml", {
-#       reset-iptables  = local.script.reset-iptables,
-#       install-kubeadm = local.script.install-kubeadm,
-#     })
-#   }
-# }

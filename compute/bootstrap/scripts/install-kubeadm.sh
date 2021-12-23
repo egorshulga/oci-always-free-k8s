@@ -22,7 +22,7 @@ EOF
 sudo sysctl --system
 
 # 1.2. Add Docker apt repository
-sudo apt-get install \
+sudo apt-get install --yes \
   ca-certificates \
   apt-transport-https \
   curl \
