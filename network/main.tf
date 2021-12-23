@@ -75,6 +75,17 @@ resource "oci_core_security_list" "public" {
       type = 3
     }
   }
+  # kubectl
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 6443
+      max = 6443
+    }
+  }
 }
 
 # Private subnet
