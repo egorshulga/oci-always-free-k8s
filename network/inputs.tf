@@ -11,7 +11,12 @@ variable "vcn_dns_label" {
   default = "vcn"
 }
 
-variable "subnet_dns_label" {
+variable "public_subnet_dns_label" {
   type = string
-  default = "subnet"
+  default = "public"
+}
+
+variable "private_subnet_dns_label" {
+  type = string
+  default = "private"
 }

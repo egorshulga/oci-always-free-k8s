@@ -22,7 +22,7 @@ resource "oci_core_instance" "worker" {
 
   create_vnic_details {
     assign_public_ip          = false
-    subnet_id                 = var.subnet_id
+    subnet_id                 = var.workers.subnet_id
     assign_private_dns_record = true
     hostname_label            = "${var.workers.base_hostname}-${count.index}"
   }

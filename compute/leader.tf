@@ -3,6 +3,18 @@ data "oci_core_images" "leader" {
   display_name   = var.leader.image
 }
 
+data "oci_core_subnet" "leader" {
+  subnet_id = var.leader.subnet_id
+}
+
+data "oci_core_vcn" "vcn" {
+  vcn_id = data.oci_core_subnet.leader.vcn_id
+}
+
+locals {
+  leader_fqdn = "${var.leader.hostname}.${data.oci_core_subnet.leader.dns_label}.${data.oci_core_vcn.vcn.dns_label}.oraclevcn.com"
+}
+
 resource "oci_core_instance" "leader" {
   compartment_id      = var.compartment_id
   availability_domain = local.availability_domain
@@ -21,7 +33,7 @@ resource "oci_core_instance" "leader" {
 
   create_vnic_details {
     assign_public_ip          = true
-    subnet_id                 = var.subnet_id
+    subnet_id                 = var.leader.subnet_id
     assign_private_dns_record = true
     hostname_label            = var.leader.hostname
   }
