@@ -13,6 +13,7 @@ sudo kubeadm init \
 mkdir -p ~/.kube
 sudo cp /etc/kubernetes/admin.conf ~/.kube/config
 sudo chown $USER:$USER ~/.kube/config
+sed -i 's/${leader-fqdn}/${leader-public-ip}/' ~/.kube/config
 
 # Setup cluster network - Calico
 # kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
