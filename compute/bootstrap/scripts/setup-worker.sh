@@ -5,4 +5,5 @@
 sudo kubeadm join \
   --ignore-preflight-errors NumCPU,Mem \
   --token=${token} \
-  --discovery-token-unsafe-skip-ca-verification # Currently we don't pass control plane's CA public key.
+  --discovery-token-unsafe-skip-ca-verification \ # Currently we don't pass control plane's CA public key.
+  ${leader-fqdn}:6443

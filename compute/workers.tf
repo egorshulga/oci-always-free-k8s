@@ -28,7 +28,7 @@ resource "oci_core_instance" "worker" {
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.ssh_key_pub)
+    ssh_authorized_keys = file(var.ssh_key_pub_path)
     user_data           = data.template_cloudinit_config.worker.rendered
   }
 }
@@ -41,7 +41,14 @@ data "template_cloudinit_config" "worker" {
     content = templatefile("${path.module}/bootstrap/cloud-init-worker.yml", {
       reset-iptables  = local.script.reset-iptables,
       install-kubeadm = local.script.install-kubeadm,
-      setup-worker    = local.script.setup-worker,
+      setup-worker    = local.setup-worker,
     })
   }
+}
+
+locals {
+  setup-worker = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
+    leader-fqdn = local.leader_fqdn,
+    token       = local.token,
+  })
 }
