@@ -7,10 +7,6 @@ write_files:
     encoding: base64
     path: /root/init/install-kubeadm.sh
     permissions: '0777'
-  - content: ${base64encode(setup-control-plane)}
-    encoding: base64
-    path: /root/init/setup-control-plane.sh
-    permissions: '0777'
 
 package_update: true
 package_upgrade: true
@@ -20,6 +16,5 @@ runcmd:
   - echo 'Running leader cloud-init script'
   - /root/init/reset-iptables.sh
   - /root/init/install-kubeadm.sh
-  - /root/init/setup-control-plane.sh
   - echo 'Leader cloud-init script complete'
   - echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd

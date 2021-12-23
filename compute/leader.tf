@@ -39,28 +39,59 @@ resource "oci_core_instance" "leader" {
   }
 
   metadata = {
-    ssh_authorized_keys = file(var.ssh_key_pub)
-    user_data           = data.template_cloudinit_config.leader.rendered
+    ssh_authorized_keys = file(var.ssh_key_pub_path)
+    # user_data = data.template_cloudinit_config.leader.rendered
   }
-}
 
-data "template_cloudinit_config" "leader" {
-  base64_encode = true
-  gzip          = true
-  part {
-    content_type = "text/cloud-config"
-    content = templatefile("${path.module}/bootstrap/cloud-init-leader.yml", {
-      reset-iptables      = local.script.reset-iptables,
-      install-kubeadm     = local.script.install-kubeadm,
-      setup-control-plane = local.script.setup-control-plane,
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = self.public_ip
+    private_key = file(var.ssh_key_path)
+    timeout     = "1m"
+  }
+  provisioner "remote-exec" {
+    inline = ["mkdir init"]
+  }
+  provisioner "file" {
+    content     = local.script.reset-iptables
+    destination = "~/init/reset-iptables.sh"
+  }
+  provisioner "file" {
+    content     = local.script.install-kubeadm
+    destination = "~/init/install-kubeadm.sh"
+  }
+  provisioner "file" {
+    content = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
+      leader-fqdn      = local.leader_fqdn,
+      token            = local.token,
+      leader-public-ip = self.public_ip,
     })
+    destination = "~/init/setup-control-plane.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'Running leader cloud-init script'",
+      "sudo apt-get update -y",
+      "sudo apt-get upgrade -y",
+      "chmod 0777 ~/init/*",
+      "~/init/reset-iptables.sh",
+      "~/init/install-kubeadm.sh",
+      "~/init/setup-control-plane.sh",
+      "echo 'Leader cloud-init script complete'",
+      "sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd\"",
+    ]
   }
 }
 
-output "leader_ip" {
-  value = oci_core_instance.leader.public_ip
-}
-
-output "leader_fqdn" {
-  value = local.leader_fqdn
-}
+# data "template_cloudinit_config" "leader" {
+#   base64_encode = true
+#   gzip          = true
+#   part {
+#     content_type = "text/cloud-config"
+#     content = templatefile("${path.module}/bootstrap/cloud-init-leader.yml", {
+#       reset-iptables  = local.script.reset-iptables,
+#       install-kubeadm = local.script.install-kubeadm,
+#     })
+#   }
+# }

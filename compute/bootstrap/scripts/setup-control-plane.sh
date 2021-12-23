@@ -6,15 +6,13 @@ sudo kubeadm init \
   --ignore-preflight-errors=NumCPU,Mem \
   --control-plane-endpoint=${leader-fqdn} \
   --pod-network-cidr=10.244.0.0/16 \
-  --token=${token}
+  --token=${token} \
+  --apiserver-cert-extra-sans=${leader-public-ip}
 
 # Prepare kube config
-USER=ubuntu
-mkdir -p /home/$USER/.kube
-sudo cp /etc/kubernetes/admin.conf /home/$USER/.kube/config
-sudo chown $USER:$USER /home/$USER/.kube/config
-
-export KUBECONFIG=/etc/kubernetes/admin.conf
+mkdir -p ~/.kube
+sudo cp /etc/kubernetes/admin.conf ~/.kube/config
+sudo chown $USER:$USER ~/.kube/config
 
 # Setup cluster network - Calico
 # kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml

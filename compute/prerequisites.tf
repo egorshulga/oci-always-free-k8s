@@ -16,13 +16,5 @@ locals {
   script = {
     reset-iptables  = file("${path.module}/bootstrap/scripts/reset-iptables.sh")
     install-kubeadm = file("${path.module}/bootstrap/scripts/install-kubeadm.sh")
-    setup-control-plane = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
-      leader-fqdn = local.leader_fqdn,
-      token       = local.token,
-    })
-    setup-worker = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
-      leader-fqdn = local.leader_fqdn,
-      token       = local.token,
-    })
   }
 }

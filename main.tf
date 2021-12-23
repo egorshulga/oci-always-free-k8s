@@ -13,9 +13,10 @@ module "network" {
 }
 
 module "compute" {
-  source         = "./compute"
-  compartment_id = module.governance.compartment_id
-  ssh_key_pub    = var.ssh_key_pub
+  source           = "./compute"
+  compartment_id   = module.governance.compartment_id
+  ssh_key_path     = var.ssh_key_path
+  ssh_key_pub_path = var.ssh_key_pub_path
 
   leader = {
     # shape         = "VM.Standard.A1.Flex"
