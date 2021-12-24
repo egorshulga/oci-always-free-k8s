@@ -31,6 +31,39 @@ resource "oci_core_instance" "worker" {
     ssh_authorized_keys = file(var.ssh_key_pub_path)
     user_data           = data.template_cloudinit_config.worker.rendered
   }
+
+  extended_metadata = {
+    vm_user      = local.vm_user
+    bastion_host = local.leader_public_ip
+    ssh_key_path = var.ssh_key_path
+  }
+
+  connection {
+    type                = "ssh"
+    user                = self.extended_metadata.vm_user
+    host                = self.private_ip
+    private_key         = file(self.metadata.ssh_key_path)
+    bastion_user        = self.extended_metadata.vm_user
+    bastion_host        = self.extended_metadata.bastion_host
+    bastion_private_key = file(self.metadata.ssh_key_path)
+    timeout             = "1m"
+  }
+  provisioner "remote-exec" {
+    inline = ["mkdir .kube"]
+  }
+  provisioner "file" {
+    source      = ".terraform/.kube/config-cluster"
+    destination = ".kube/config"
+  }
+
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "kubectl drain ${self.hostname_label} --force",
+      "kubectl delete node ${self.hostname_label}",
+    ]
+    on_failure = continue
+  }
 }
 
 data "template_cloudinit_config" "worker" {
@@ -48,7 +81,7 @@ data "template_cloudinit_config" "worker" {
 
 locals {
   setup-worker = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
-    leader-fqdn = local.leader_fqdn,
-    token       = local.token,
+    leader-url = local.leader_private_ip,
+    token      = local.token,
   })
 }

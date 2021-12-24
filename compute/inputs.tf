@@ -4,12 +4,13 @@ variable "ssh_key_pub_path" { type = string }
 
 variable "leader" {
   type = object({
-    shape         = string
-    image         = string
-    ocpus         = number
-    memory_in_gbs = number
-    hostname      = string
-    subnet_id     = string
+    shape                       = string
+    image                       = string
+    ocpus                       = number
+    memory_in_gbs               = number
+    hostname                    = string
+    subnet_id                   = string
+    overwrite_local_kube_config = bool
   })
 }
 

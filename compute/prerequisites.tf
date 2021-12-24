@@ -5,6 +5,7 @@ data "oci_identity_availability_domains" "ads" {
 
 locals {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+  vm_user             = "ubuntu"
 }
 
 # module "kubeadm-token" {

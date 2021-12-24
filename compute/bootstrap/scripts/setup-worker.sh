@@ -4,7 +4,7 @@
 # We also ignore memory requirement, as for testing we deploy cluster to micro shapes.
 # Currently we don't pass control plane's CA public key.
 sudo kubeadm join \
-  --ignore-preflight-errors NumCPU,Mem \
+  --ignore-preflight-errors=NumCPU,Mem \
   --token=${token} \
   --discovery-token-unsafe-skip-ca-verification \
-  ${leader-fqdn}:6443
+  ${leader-url}:6443

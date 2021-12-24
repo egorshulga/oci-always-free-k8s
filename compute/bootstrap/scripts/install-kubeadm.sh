@@ -48,7 +48,7 @@ if ! grep -q 'SystemdCgroup = true' /etc/containerd/config.toml; then
   if grep -q 'SystemdCgroup = false' /etc/containerd/config.toml; then
     sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
   else
-    sudo sed -i 's/\[plugins\."io\.containerd\.grpc\.v1\.cri"\.containerd\.runtimes\.runc\.options\]/&\n            SystemdCgroup = true/' config.toml
+    sudo sed -i 's/\[plugins\."io\.containerd\.grpc\.v1\.cri"\.containerd\.runtimes\.runc\.options\]/&\n            SystemdCgroup = true/' /etc/containerd/config.toml
   fi
 fi
 sudo systemctl restart containerd

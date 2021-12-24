@@ -11,10 +11,6 @@ data "oci_core_vcn" "vcn" {
   vcn_id = data.oci_core_subnet.leader.vcn_id
 }
 
-locals {
-  leader_fqdn = "${var.leader.hostname}.${data.oci_core_subnet.leader.dns_label}.${data.oci_core_vcn.vcn.dns_label}.oraclevcn.com"
-}
-
 resource "oci_core_instance" "leader" {
   compartment_id      = var.compartment_id
   availability_domain = local.availability_domain
@@ -40,12 +36,11 @@ resource "oci_core_instance" "leader" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_key_pub_path)
-    # user_data = data.template_cloudinit_config.leader.rendered
   }
 
   connection {
     type        = "ssh"
-    user        = "ubuntu"
+    user        = local.vm_user
     host        = self.public_ip
     private_key = file(var.ssh_key_path)
     timeout     = "1m"
@@ -62,9 +57,20 @@ resource "oci_core_instance" "leader" {
     destination = "/home/ubuntu/init/install-kubeadm.sh"
   }
   provisioner "file" {
-    content = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
+    content     = file("${path.module}/bootstrap/scripts/prepare-kube-config-for-cluster.sh")
+    destination = "/home/ubuntu/init/prepare-kube-config-for-cluster.sh"
+  }
+  provisioner "file" {
+    content = templatefile("${path.module}/bootstrap/scripts/prepare-kube-config-for-external.sh", {
       leader-fqdn      = local.leader_fqdn,
+      leader-public-ip = self.public_ip,
+    })
+    destination = "/home/ubuntu/init/prepare-kube-config-for-external.sh"
+  }
+  provisioner "file" {
+    content = templatefile("${path.module}/bootstrap/scripts/setup-control-plane.sh", {
       token            = local.token,
+      leader-fqdn      = local.leader_fqdn,
       leader-public-ip = self.public_ip,
     })
     destination = "/home/ubuntu/init/setup-control-plane.sh"
@@ -78,8 +84,29 @@ resource "oci_core_instance" "leader" {
       "~/init/reset-iptables.sh",
       "~/init/install-kubeadm.sh",
       "~/init/setup-control-plane.sh",
+      "~/init/prepare-kube-config-for-cluster.sh",
+      "~/init/prepare-kube-config-for-external.sh",
       "echo 'Leader cloud-init script complete'",
       "sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd\"",
     ]
   }
+  provisioner "local-exec" {
+    command = "mkdir .terraform\\.kube"
+    on_failure = continue
+  }
+  provisioner "local-exec" {
+    command = "scp -i \"${var.ssh_key_path}\" -o StrictHostKeyChecking=accept-new ${local.vm_user}@${self.public_ip}:~/.kube/config .terraform/.kube/config-cluster"
+  }
+  provisioner "local-exec" {
+    command = "scp -i \"${var.ssh_key_path}\" -o StrictHostKeyChecking=accept-new ${local.vm_user}@${self.public_ip}:~/.kube/config-external .terraform/.kube/config-external"
+  }
+  provisioner "local-exec" {
+    command = var.leader.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
+  }
+}
+
+locals {
+  leader_public_ip  = oci_core_instance.leader.public_ip
+  leader_private_ip = oci_core_instance.leader.private_ip
+  leader_fqdn       = "${var.leader.hostname}.${data.oci_core_subnet.leader.dns_label}.${data.oci_core_vcn.vcn.dns_label}.oraclevcn.com"
 }
