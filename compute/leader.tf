@@ -100,10 +100,10 @@ resource "oci_core_instance" "leader" {
     on_failure = continue
   }
   provisioner "local-exec" {
-    command = "scp -i \"${var.ssh_key_path}\" -o StrictHostKeyChecking=accept-new ${local.vm_user}@${self.public_ip}:~/.kube/config .terraform/.kube/config-cluster"
+    command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=accept-new ${local.vm_user}@${self.public_ip}:~/.kube/config .terraform/.kube/config-cluster"
   }
   provisioner "local-exec" {
-    command = "scp -i \"${var.ssh_key_path}\" -o StrictHostKeyChecking=accept-new ${local.vm_user}@${self.public_ip}:~/.kube/config-external .terraform/.kube/config-external"
+    command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=accept-new ${local.vm_user}@${self.public_ip}:~/.kube/config-external .terraform/.kube/config-external"
   }
   provisioner "local-exec" {
     command = var.leader.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
