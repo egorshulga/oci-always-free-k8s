@@ -8,9 +8,3 @@ sudo kubeadm init \
   --pod-network-cidr=10.244.0.0/16 \
   --token=${token} \
   --apiserver-cert-extra-sans=${leader-public-ip}
-
-# Setup cluster network - Calico
-# kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-
-# Setup cluster network - Flannel
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml

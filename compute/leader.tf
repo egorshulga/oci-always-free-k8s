@@ -75,6 +75,10 @@ resource "oci_core_instance" "leader" {
     })
     destination = "/home/ubuntu/init/setup-control-plane.sh"
   }
+  provisioner "file" {
+    content     = file("${path.module}/bootstrap/scripts/setup-cluster-network.sh")
+    destination = "/home/ubuntu/init/setup-cluster-network.sh"
+  }
   provisioner "remote-exec" {
     inline = [
       "echo 'Running leader init script'",
@@ -86,6 +90,7 @@ resource "oci_core_instance" "leader" {
       "~/init/setup-control-plane.sh",
       "~/init/prepare-kube-config-for-cluster.sh",
       "~/init/prepare-kube-config-for-external.sh",
+      "~/init/setup-cluster-network.sh",
       "echo 'Leader init script complete'",
       "sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd\"",
     ]
