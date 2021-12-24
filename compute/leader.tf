@@ -77,7 +77,7 @@ resource "oci_core_instance" "leader" {
   }
   provisioner "remote-exec" {
     inline = [
-      "echo 'Running leader cloud-init script'",
+      "echo 'Running leader init script'",
       "sudo apt-get update --yes",
       "sudo apt-get upgrade --yes",
       "chmod 0777 ~/init/*",
@@ -86,12 +86,12 @@ resource "oci_core_instance" "leader" {
       "~/init/setup-control-plane.sh",
       "~/init/prepare-kube-config-for-cluster.sh",
       "~/init/prepare-kube-config-for-external.sh",
-      "echo 'Leader cloud-init script complete'",
+      "echo 'Leader init script complete'",
       "sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd\"",
     ]
   }
   provisioner "local-exec" {
-    command = "mkdir .terraform\\.kube"
+    command    = "mkdir .terraform\\.kube"
     on_failure = continue
   }
   provisioner "local-exec" {

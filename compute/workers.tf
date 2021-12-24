@@ -29,7 +29,6 @@ resource "oci_core_instance" "worker" {
 
   metadata = {
     ssh_authorized_keys = file(var.ssh_key_pub_path)
-    user_data           = data.template_cloudinit_config.worker.rendered
   }
 
   extended_metadata = {
@@ -42,18 +41,46 @@ resource "oci_core_instance" "worker" {
     type                = "ssh"
     user                = self.extended_metadata.vm_user
     host                = self.private_ip
-    private_key         = file(self.metadata.ssh_key_path)
+    private_key         = file(self.extended_metadata.ssh_key_path)
     bastion_user        = self.extended_metadata.vm_user
     bastion_host        = self.extended_metadata.bastion_host
-    bastion_private_key = file(self.metadata.ssh_key_path)
+    bastion_private_key = file(self.extended_metadata.ssh_key_path)
     timeout             = "1m"
   }
   provisioner "remote-exec" {
-    inline = ["mkdir .kube"]
+    inline = ["mkdir .kube init"]
   }
   provisioner "file" {
     source      = ".terraform/.kube/config-cluster"
     destination = ".kube/config"
+  }
+  provisioner "file" {
+    content     = local.script.reset-iptables
+    destination = "/home/ubuntu/init/reset-iptables.sh"
+  }
+  provisioner "file" {
+    content     = local.script.install-kubeadm
+    destination = "/home/ubuntu/init/install-kubeadm.sh"
+  }
+  provisioner "file" {
+    content = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
+      leader-url = local.leader_private_ip,
+      token      = local.token,
+    })
+    destination = "/home/ubuntu/init/setup-worker.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'Running worker init script'",
+      "sudo apt-get update --yes",
+      "sudo apt-get upgrade --yes",
+      "chmod 0777 ~/init/*",
+      "~/init/reset-iptables.sh",
+      "~/init/install-kubeadm.sh",
+      "~/init/setup-worker.sh",
+      "echo 'Worker init script complete'",
+      "sudo bash -c \"echo 'This is a worker instance, which was provisioned by Terraform' >> /etc/motd\"",
+    ]
   }
 
   provisioner "remote-exec" {
@@ -64,24 +91,4 @@ resource "oci_core_instance" "worker" {
     ]
     on_failure = continue
   }
-}
-
-data "template_cloudinit_config" "worker" {
-  base64_encode = true
-  gzip          = true
-  part {
-    content_type = "text/cloud-config"
-    content = templatefile("${path.module}/bootstrap/cloud-init-worker.yml", {
-      reset-iptables  = local.script.reset-iptables,
-      install-kubeadm = local.script.install-kubeadm,
-      setup-worker    = local.setup-worker,
-    })
-  }
-}
-
-locals {
-  setup-worker = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
-    leader-url = local.leader_private_ip,
-    token      = local.token,
-  })
 }
