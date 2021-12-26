@@ -1,0 +1,7 @@
+tenancy_ocid = "ocid1.tenancy.oc1..."
+user_ocid    = "ocid1.user.oc1..."
+
+fingerprint      = "60:...:c3"
+private_key_path = "C:\\Users\\...\\.oci\\oci-tf.pem"
+ssh_key_path     = "C:\\Users\\...\\.ssh\\id_ed25519"
+ssh_key_pub_path = "C:\\Users\\...\\.ssh\\id_ed25519.pub"
