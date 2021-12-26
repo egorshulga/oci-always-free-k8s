@@ -61,4 +61,15 @@ resource "oci_core_security_list" "private" {
       max = 10250
     }
   }
+  # NodePort Services
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 30000
+      max = 32767
+    }
+  }
 }
