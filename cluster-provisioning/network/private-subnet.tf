@@ -61,6 +61,17 @@ resource "oci_core_security_list" "private" {
       max = 10250
     }
   }
+  # flannel
+  ingress_security_rules {
+    stateless   = false
+    source      = "10.0.0.0/16"
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.UDP
+    udp_options {
+      min = 8472
+      max = 8472
+    }
+  }
   # NodePort Services
   ingress_security_rules {
     stateless   = false

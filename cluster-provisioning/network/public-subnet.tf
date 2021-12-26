@@ -61,4 +61,15 @@ resource "oci_core_security_list" "public" {
       max = 6443
     }
   }
+  # flannel
+  ingress_security_rules {
+    stateless   = false
+    source      = "10.0.0.0/16"
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.UDP
+    udp_options {
+      min = 8472
+      max = 8472
+    }
+  }
 }
