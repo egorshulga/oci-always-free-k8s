@@ -2,6 +2,9 @@ variable "compartment_id" { type = string }
 variable "ssh_key_path" { type = string }
 variable "ssh_key_pub_path" { type = string }
 
+variable "load_balancer_id" { type = string }
+variable "cluster_public_ip" { type = string }
+
 variable "leader" {
   type = object({
     shape                       = string
