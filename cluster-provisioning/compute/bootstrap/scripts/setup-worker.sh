@@ -5,6 +5,6 @@
 # Currently we don't pass control plane's CA public key.
 sudo kubeadm join \
   --ignore-preflight-errors=NumCPU,Mem \
-  --token=${token} \
+  --token=${k8s_discovery_token} \
   --discovery-token-unsafe-skip-ca-verification \
-  ${leader-url}:6443
+  ${leader_url}:6443

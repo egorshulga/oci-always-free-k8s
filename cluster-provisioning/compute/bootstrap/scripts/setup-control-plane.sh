@@ -6,5 +6,5 @@ sudo kubeadm init \
   --ignore-preflight-errors=NumCPU,Mem \
   --control-plane-endpoint=${leader-fqdn} \
   --pod-network-cidr=10.244.0.0/16 \
-  --token=${token} \
+  --token=${k8s_discovery_token} \
   --apiserver-cert-extra-sans=${leader-public-ip}
