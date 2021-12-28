@@ -15,13 +15,13 @@ resource "oci_core_security_list" "public" {
   # Default rules
   egress_security_rules {
     stateless        = false
-    destination      = "0.0.0.0/0"
+    destination      = "0.0.0.0/0" # internet
     destination_type = "CIDR_BLOCK"
     protocol         = "all"
   }
   ingress_security_rules {
     stateless   = false
-    source      = "0.0.0.0/0"
+    source      = "0.0.0.0/0" # internet
     source_type = "CIDR_BLOCK"
     protocol    = local.protocol.TCP
     tcp_options {
@@ -53,7 +53,7 @@ resource "oci_core_security_list" "public" {
   # k8s API server
   ingress_security_rules {
     stateless   = false
-    source      = "0.0.0.0/0"
+    source      = "0.0.0.0/0" # internet
     source_type = "CIDR_BLOCK"
     protocol    = local.protocol.TCP
     tcp_options {
@@ -64,7 +64,7 @@ resource "oci_core_security_list" "public" {
   # flannel
   ingress_security_rules {
     stateless   = false
-    source      = "10.0.0.0/16"
+    source      = "10.0.0.0/16" # vcn
     source_type = "CIDR_BLOCK"
     protocol    = local.protocol.UDP
     udp_options {
