@@ -1,15 +1,16 @@
 module "governance" {
-  source       = "./governance"
-  tenancy_ocid = var.tenancy_ocid
+  source           = "./governance"
+  tenancy_ocid     = var.tenancy_ocid
   compartment_name = "terraformed"
 }
 
 module "network" {
-  source                  = "./network"
-  compartment_id          = module.governance.compartment_id
-  region                  = var.region
-  vcn_dns_label           = "vcn"
-  public_subnet_dns_label = "public"
+  source                   = "./network"
+  compartment_id           = module.governance.compartment_id
+  region                   = var.region
+  vcn_dns_label            = "vcn"
+  public_subnet_dns_label  = "public"
+  private_subnet_dns_label = "private"
 }
 
 module "compute" {
@@ -29,19 +30,19 @@ module "compute" {
     ocpus                       = 1
     memory_in_gbs               = 1
     hostname                    = "leader"
-    subnet_id                   = module.network.public_subnet_id
+    subnet_id                   = module.network.private_subnet_id
     overwrite_local_kube_config = true
   }
   workers = {
-    count = 0
-    shape = "VM.Standard.A1.Flex"
-    image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
-    # shape = "VM.Standard.E2.1.Micro"
-    # image = "Canonical-Ubuntu-20.04-2021.12.01-0"
+    count = 1
+    # shape = "VM.Standard.A1.Flex"
+    # image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
+    shape = "VM.Standard.E2.1.Micro"
+    image = "Canonical-Ubuntu-20.04-2021.12.01-0"
     ocpus         = 1
-    memory_in_gbs = 6
+    memory_in_gbs = 1
     base_hostname = "worker"
-    subnet_id     = module.network.public_subnet_id
+    subnet_id     = module.network.private_subnet_id
   }
 }
 
