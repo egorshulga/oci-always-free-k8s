@@ -1,6 +1,7 @@
 module "governance" {
   source       = "./governance"
   tenancy_ocid = var.tenancy_ocid
+  compartment_name = "terraformed"
 }
 
 module "network" {
@@ -21,18 +22,18 @@ module "compute" {
   cluster_public_ip = module.network.reserved_public_ip.ip_address
 
   leader = {
-    shape = "VM.Standard.A1.Flex"
-    image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
-    # shape = "VM.Standard.E2.1.Micro"
-    # image = "Canonical-Ubuntu-20.04-2021.12.01-0"
+    # shape = "VM.Standard.A1.Flex"
+    # image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
+    shape = "VM.Standard.E2.1.Micro"
+    image = "Canonical-Ubuntu-20.04-2021.12.01-0"
     ocpus                       = 1
-    memory_in_gbs               = 6
+    memory_in_gbs               = 1
     hostname                    = "leader"
     subnet_id                   = module.network.public_subnet_id
     overwrite_local_kube_config = true
   }
   workers = {
-    count = 1
+    count = 0
     shape = "VM.Standard.A1.Flex"
     image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
     # shape = "VM.Standard.E2.1.Micro"
