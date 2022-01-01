@@ -21,6 +21,7 @@ module "compute" {
 
   load_balancer_id  = module.network.load_balancer_id
   cluster_public_ip = module.network.reserved_public_ip.ip_address
+  cluster_dns_name  = var.cluster_dns_name
 
   leader = {
     shape = "VM.Standard.A1.Flex"

@@ -4,6 +4,10 @@ variable "ssh_key_pub_path" { type = string }
 
 variable "load_balancer_id" { type = string }
 variable "cluster_public_ip" { type = string }
+variable "cluster_dns_name" {
+  type    = string
+  default = null
+}
 
 variable "leader" {
   type = object({

@@ -1,3 +1,4 @@
+region       = "eu-amsterdam-1"
 tenancy_ocid = "ocid1.tenancy.oc1..."
 user_ocid    = "ocid1.user.oc1..."
 
