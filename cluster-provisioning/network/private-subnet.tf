@@ -50,10 +50,21 @@ resource "oci_core_security_list" "private" {
       type = 3
     }
   }
+  # k8s API server
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0" # Internet. This is a private subnet, but requests are forwarded via LB, and source IP is preserved.
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 6443
+      max = 6443
+    }
+  }
   # kubelet API
   ingress_security_rules {
     stateless   = false
-    source      = "10.0.0.0/16"
+    source      = "10.0.0.0/16" # vcn
     source_type = "CIDR_BLOCK"
     protocol    = local.protocol.TCP
     tcp_options {
@@ -64,7 +75,7 @@ resource "oci_core_security_list" "private" {
   # flannel
   ingress_security_rules {
     stateless   = false
-    source      = "10.0.0.0/16"
+    source      = "10.0.0.0/16" # vcn
     source_type = "CIDR_BLOCK"
     protocol    = local.protocol.UDP
     udp_options {
@@ -75,7 +86,7 @@ resource "oci_core_security_list" "private" {
   # NodePort Services
   ingress_security_rules {
     stateless   = false
-    source      = "0.0.0.0/0"
+    source      = "0.0.0.0/0" # Internet
     source_type = "CIDR_BLOCK"
     protocol    = local.protocol.TCP
     tcp_options {
