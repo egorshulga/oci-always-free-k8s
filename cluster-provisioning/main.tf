@@ -35,7 +35,7 @@ module "compute" {
     overwrite_local_kube_config = true
   }
   workers = {
-    count = 0
+    count = 2
     shape = "VM.Standard.A1.Flex"
     image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
     # shape = "VM.Standard.E2.1.Micro"

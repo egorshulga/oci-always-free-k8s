@@ -172,19 +172,14 @@ resource "null_resource" "leader_setup" {
   provisioner "remote-exec" { inline = ["~/init/setup-cluster-network.sh"] }
   provisioner "remote-exec" { inline = ["echo 'Leader init script complete'"] }
   provisioner "remote-exec" { inline = ["sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd\""] }
+  
   provisioner "local-exec" {
     command    = "mkdir .terraform\\.kube"
     on_failure = continue
   }
-  provisioner "local-exec" {
-    command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${local.vm_user}@${var.cluster_public_ip}:~/.kube/config .terraform/.kube/config-cluster"
-  }
-  provisioner "local-exec" {
-    command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${local.vm_user}@${var.cluster_public_ip}:~/.kube/config-external .terraform/.kube/config-external"
-  }
-  provisioner "local-exec" {
-    command = var.leader.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
-  }
+  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${local.vm_user}@${var.cluster_public_ip}:~/.kube/config .terraform/.kube/config-cluster" }
+  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${local.vm_user}@${var.cluster_public_ip}:~/.kube/config-external .terraform/.kube/config-external" }
+  provisioner "local-exec" { command = var.leader.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external" }
 
   provisioner "remote-exec" {
     when       = destroy
