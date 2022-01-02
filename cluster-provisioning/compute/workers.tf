@@ -7,8 +7,8 @@ resource "oci_core_instance" "worker" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
-  display_name = "${var.workers.base_hostname}-${count.index}"
   count        = var.workers.count
+  display_name = "${var.workers.base_hostname}-${count.index}"
 
   shape = var.workers.shape
   shape_config {
@@ -67,6 +67,7 @@ resource "oci_core_instance" "worker" {
     content = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
       leader_url          = local.leader_fqdn,
       k8s_discovery_token = local.k8s_discovery_token,
+      node_name           = self.create_vnic_details.hostname_label
     })
     destination = "/home/ubuntu/init/setup-worker.sh"
   }
@@ -88,4 +89,70 @@ resource "oci_core_instance" "worker" {
     ]
     on_failure = continue
   }
+}
+
+# Load Balancer - HTTP
+
+resource "oci_network_load_balancer_backend_set" "workers_http" {
+  network_load_balancer_id = var.load_balancer_id
+  name                     = "workers_http"
+  policy                   = "FIVE_TUPLE"
+  is_preserve_source       = true
+  health_checker {
+    protocol = "TCP"
+    port     = 22
+  }
+  lifecycle {
+    ignore_changes = [backends]
+  }
+}
+
+resource "oci_network_load_balancer_backend" "worker_http" {
+  count                    = var.workers.count
+  backend_set_name         = oci_network_load_balancer_backend_set.workers_http.name
+  network_load_balancer_id = var.load_balancer_id
+  name                     = "worker-${count.index}-http"
+  port                     = 30080 # Nginx ingress-controller service NodePort
+  target_id                = oci_core_instance.worker[count.index].id
+}
+
+resource "oci_network_load_balancer_listener" "workers_http" {
+  default_backend_set_name = oci_network_load_balancer_backend_set.workers_http.name
+  name                     = "workers_http"
+  network_load_balancer_id = var.load_balancer_id
+  port                     = 80
+  protocol                 = "TCP"
+}
+
+# Load Balancer - HTTPS
+
+resource "oci_network_load_balancer_backend_set" "workers_https" {
+  network_load_balancer_id = var.load_balancer_id
+  name                     = "workers_https"
+  policy                   = "FIVE_TUPLE"
+  is_preserve_source       = true
+  health_checker {
+    protocol = "TCP"
+    port     = 22
+  }
+  lifecycle {
+    ignore_changes = [backends]
+  }
+}
+
+resource "oci_network_load_balancer_backend" "worker_https" {
+  count                    = var.workers.count
+  backend_set_name         = oci_network_load_balancer_backend_set.workers_https.name
+  network_load_balancer_id = var.load_balancer_id
+  name                     = "worker-${count.index}-https"
+  port                     = 30443 # Nginx ingress-controller service NodePort
+  target_id                = oci_core_instance.worker[count.index].id
+}
+
+resource "oci_network_load_balancer_listener" "workers_https" {
+  default_backend_set_name = oci_network_load_balancer_backend_set.workers_https.name
+  name                     = "workers_https"
+  network_load_balancer_id = var.load_balancer_id
+  port                     = 443
+  protocol                 = "TCP"
 }

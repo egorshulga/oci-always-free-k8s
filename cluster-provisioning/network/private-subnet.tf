@@ -94,4 +94,15 @@ resource "oci_core_security_list" "private" {
       max = 32767
     }
   }
+  # Nginx ingress-controller admission webhook
+  ingress_security_rules {
+    stateless   = false
+    source      = "10.0.0.0/16" # vcn
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 8443
+      max = 8443
+    }
+  }
 }

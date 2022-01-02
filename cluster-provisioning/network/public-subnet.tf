@@ -61,4 +61,26 @@ resource "oci_core_security_list" "public" {
       max = 6443
     }
   }
+  # HTTP
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0" # internet
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 80
+      max = 80
+    }
+  }
+  # HTTPS
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0" # internet
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 443
+      max = 443
+    }
+  }
 }
