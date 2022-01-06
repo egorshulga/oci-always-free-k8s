@@ -67,7 +67,7 @@ resource "oci_core_instance" "worker" {
     content = templatefile("${path.module}/bootstrap/scripts/setup-worker.sh", {
       leader_url          = local.leader_fqdn,
       k8s_discovery_token = local.k8s_discovery_token,
-      node_name           = self.create_vnic_details.hostname_label
+      node_name           = self.create_vnic_details[0].hostname_label
     })
     destination = "/home/ubuntu/init/setup-worker.sh"
   }

@@ -39,6 +39,9 @@ metadata:
   namespace: ingress-nginx
 data:
   allow-snippet-annotations: "true"
+  hsts: "true"
+  hsts-include-subdomains: "true"
+  hsts-max-age: "30"
 ---
 # Source: ingress-nginx/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1

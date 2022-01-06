@@ -20,7 +20,6 @@ metadata:
   name: kubernetes-dashboard
 
 ---
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -30,7 +29,6 @@ metadata:
   namespace: kubernetes-dashboard
 
 ---
-
 kind: Service
 apiVersion: v1
 metadata:
@@ -46,7 +44,6 @@ spec:
     k8s-app: kubernetes-dashboard
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -57,7 +54,6 @@ metadata:
 type: Opaque
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -70,7 +66,6 @@ data:
   csrf: ""
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -81,7 +76,6 @@ metadata:
 type: Opaque
 
 ---
-
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -91,7 +85,6 @@ metadata:
   namespace: kubernetes-dashboard
 
 ---
-
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -103,7 +96,12 @@ rules:
   # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
   - apiGroups: [""]
     resources: ["secrets"]
-    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
+    resourceNames:
+      [
+        "kubernetes-dashboard-key-holder",
+        "kubernetes-dashboard-certs",
+        "kubernetes-dashboard-csrf",
+      ]
     verbs: ["get", "update", "delete"]
     # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
   - apiGroups: [""]
@@ -117,11 +115,17 @@ rules:
     verbs: ["proxy"]
   - apiGroups: [""]
     resources: ["services/proxy"]
-    resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
+    resourceNames:
+      [
+        "heapster",
+        "http:heapster:",
+        "https:heapster:",
+        "dashboard-metrics-scraper",
+        "http:dashboard-metrics-scraper",
+      ]
     verbs: ["get"]
 
 ---
-
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -135,7 +139,6 @@ rules:
     verbs: ["get", "list", "watch"]
 
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -153,7 +156,6 @@ subjects:
     namespace: kubernetes-dashboard
 
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -168,7 +170,6 @@ subjects:
     namespace: kubernetes-dashboard
 
 ---
-
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -234,7 +235,6 @@ spec:
           effect: NoSchedule
 
 ---
-
 kind: Service
 apiVersion: v1
 metadata:
@@ -250,7 +250,6 @@ spec:
     k8s-app: dashboard-metrics-scraper
 
 ---
-
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -286,8 +285,8 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           volumeMounts:
-          - mountPath: /tmp
-            name: tmp-volume
+            - mountPath: /tmp
+              name: tmp-volume
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -305,27 +304,31 @@ spec:
           emptyDir: {}
 
 ---
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-dashboard
   namespace: kubernetes-dashboard
   annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/dashboard)$ $1/ redirect;
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - cluster.egorshul.ga
+      secretName: dashboard-tls
   rules:
-  - host: cluster.egorshul.ga
-    http:
-      paths:
-      - path: /dashboard(/|$)(.*)
-        pathType: Prefix
-        backend:
-          service:
-            name: kubernetes-dashboard
-            port:
-              number: 443
+    - host: cluster.egorshul.ga
+      http:
+        paths:
+          - path: /dashboard(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 443
