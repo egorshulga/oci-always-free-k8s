@@ -26,7 +26,9 @@ variable "ssh_key_pub_path" {
   type = string
 }
 
-variable "cluster_public_address" {
+variable "cluster_public_dns_name" {
   type    = string
   default = null
 }
+
+variable "letsencrypt_registration_email" { type = string }

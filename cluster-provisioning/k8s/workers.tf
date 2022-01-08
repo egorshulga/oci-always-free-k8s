@@ -48,15 +48,11 @@ resource "null_resource" "worker_setup" {
     })]
   }
   provisioner "remote-exec" { inline = ["echo 'Worker init script complete'"] }
-  provisioner "remote-exec" { inline = ["sudo bash -c \"echo 'This is a worker instance, which was provisioned by Terraform' >> /etc/motd\""] }
+  provisioner "remote-exec" { inline = ["sudo bash -c \"echo 'This is a worker instance, which was provisioned by Terraform on $(date)' >> /etc/motd\""] }
 
   provisioner "remote-exec" {
     when       = destroy
     on_failure = continue
-    inline = [
-      "kubectl drain ${self.triggers.hostname} --force --ignore-daemonsets",
-      "kubectl delete node ${self.triggers.hostname}",
-      "sudo kubeadm reset --force",
-    ]
+    inline = [file("${path.module}/scripts/reset.sh")]
   }
 }

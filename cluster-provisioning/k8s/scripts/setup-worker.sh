@@ -7,7 +7,7 @@ sudo kubeadm join \
   --ignore-preflight-errors=NumCPU,Mem \
   --node-name=${node_name} \
   --token=$(< .kube/join-token) \
-  --discovery-token-ca-cert-hash=sha256:$(< .kube/join-hash) \
+  --discovery-token-unsafe-skip-ca-verification \
   ${leader_url}:6443
-
+  
 kubectl label node ${node_name} node-role.kubernetes.io/worker=worker

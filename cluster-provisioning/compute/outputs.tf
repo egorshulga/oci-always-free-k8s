@@ -14,6 +14,7 @@ output "leader" {
 
 output "workers" {
   value = [for worker in oci_core_instance.worker : {
+    id         = worker.id
     private_ip = worker.private_ip
     hostname   = worker.hostname_label
     vm_user    = local.vm_user

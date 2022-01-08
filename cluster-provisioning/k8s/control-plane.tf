@@ -6,16 +6,16 @@ resource "null_resource" "control_plane_setup" {
     lb_listener = var.leader.ssh_lb.listener_id # - LB port 22 listener has been launched,
     lb_backend  = var.leader.ssh_lb.backend_id  # - LB forwarder has set-up.
 
-    vm_user           = var.leader.vm_user
-    ssh_key_path      = var.ssh_key_path
-    hostname          = var.leader.hostname
-    cluster_public_ip = var.cluster_public_ip
+    vm_user                = var.leader.vm_user
+    cluster_public_address = local.cluster_public_address
+    ssh_key_path           = var.ssh_key_path
+    hostname               = var.leader.hostname
   }
 
   connection {
     type        = "ssh"
     user        = self.triggers.vm_user
-    host        = self.triggers.cluster_public_ip # Load balancer public ip. SSH port is configured to point to leader node (see above).
+    host        = self.triggers.cluster_public_address # Load balancer public address. SSH port is configured to point to leader node (see above).
     private_key = file(self.triggers.ssh_key_path)
     timeout     = "5m"
   }
@@ -25,22 +25,22 @@ resource "null_resource" "control_plane_setup" {
   provisioner "remote-exec" { inline = [local.script.install-kubeadm] }
   provisioner "remote-exec" {
     inline = [templatefile("${path.module}/scripts/setup-control-plane.sh", {
-      node-name           = var.leader.hostname,
-      leader-fqdn         = var.leader.fqdn,
-      cluster-public-ip   = var.cluster_public_ip,
-      cluster-dns-name    = var.cluster_public_address,
+      node-name         = var.leader.hostname,
+      leader-fqdn       = var.leader.fqdn,
+      cluster-public-ip = var.cluster_public_ip,
+      cluster-dns-name  = var.cluster_public_dns_name,
     })]
   }
   provisioner "remote-exec" { inline = [file("${path.module}/scripts/prepare-kube-config-for-cluster.sh")] }
   provisioner "remote-exec" {
     inline = [templatefile("${path.module}/scripts/prepare-kube-config-for-external.sh", {
       leader-fqdn            = var.leader.fqdn,
-      cluster-public-address = var.cluster_public_address != null ? var.cluster_public_address : var.cluster_public_ip,
+      cluster-public-address = local.cluster_public_address,
     })]
   }
   provisioner "remote-exec" { inline = [file("${path.module}/scripts/setup-cluster-network.sh")] }
   provisioner "remote-exec" { inline = ["echo 'Leader init script complete'"] }
-  provisioner "remote-exec" { inline = ["sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform' >> /etc/motd\""] }
+  provisioner "remote-exec" { inline = ["sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform on $(date)' >> /etc/motd\""] }
 
   provisioner "local-exec" {
     command    = "mkdir .terraform\\.kube"
@@ -55,11 +55,7 @@ resource "null_resource" "control_plane_setup" {
   provisioner "remote-exec" {
     when       = destroy
     on_failure = continue
-    inline = [
-      "kubectl drain ${self.triggers.hostname} --force --ignore-daemonsets",
-      "kubectl delete node ${self.triggers.hostname} --force",
-      "sudo kubeadm reset --force",
-    ]
+    inline = [file("${path.module}/scripts/reset.sh")]
   }
 }
 

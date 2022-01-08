@@ -1,13 +1,13 @@
 
 variable "ssh_key_path" { type = string }
 variable "cluster_public_ip" { type = string }
-variable "cluster_public_address" {
+variable "cluster_public_dns_name" {
   type    = string
   default = null
 }
 variable "load_balancer_id" { type = string }
 variable "overwrite_local_kube_config" {
-  type = bool
+  type    = bool
   default = false
 }
 
@@ -27,6 +27,7 @@ variable "leader" {
 
 variable "workers" {
   type = list(object({
+    id         = string
     private_ip = string
     hostname   = string
     vm_user    = string
