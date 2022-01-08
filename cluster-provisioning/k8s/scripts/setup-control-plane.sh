@@ -6,6 +6,7 @@ sudo kubeadm init \
   --ignore-preflight-errors=NumCPU,Mem \
   --control-plane-endpoint=${leader-fqdn} \
   --pod-network-cidr=10.244.0.0/16 \
+  --node-name=${node-name} \
   --token=${k8s_discovery_token} \
   ${cluster-dns-name == null ? "\\" : "--apiserver-cert-extra-sans=${cluster-dns-name} \\"}
   --apiserver-cert-extra-sans=${cluster-public-ip}

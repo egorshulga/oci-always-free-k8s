@@ -6,7 +6,7 @@
 sudo kubeadm join \
   --ignore-preflight-errors=NumCPU,Mem \
   --token=${k8s_discovery_token} \
-  --node-name=${node_name}
+  --node-name=${node_name} \
   --discovery-token-unsafe-skip-ca-verification \
   ${leader_url}:6443
 

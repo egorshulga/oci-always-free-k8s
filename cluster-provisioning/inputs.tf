@@ -26,7 +26,7 @@ variable "ssh_key_pub_path" {
   type = string
 }
 
-variable "cluster_dns_name" {
+variable "cluster_public_address" {
   type    = string
   default = null
 }
