@@ -5,9 +5,9 @@
 # Currently we don't pass control plane's CA public key.
 sudo kubeadm join \
   --ignore-preflight-errors=NumCPU,Mem \
-  --token=${k8s_discovery_token} \
   --node-name=${node_name} \
-  --discovery-token-unsafe-skip-ca-verification \
+  --token=$(< .kube/join-token) \
+  --discovery-token-ca-cert-hash=sha256:$(< .kube/join-hash) \
   ${leader_url}:6443
 
 kubectl label node ${node_name} node-role.kubernetes.io/worker=worker

@@ -25,11 +25,10 @@ resource "null_resource" "control_plane_setup" {
   provisioner "remote-exec" { inline = [local.script.install-kubeadm] }
   provisioner "remote-exec" {
     inline = [templatefile("${path.module}/scripts/setup-control-plane.sh", {
-      k8s_discovery_token = local.k8s_discovery_token,
       node-name           = var.leader.hostname,
       leader-fqdn         = var.leader.fqdn,
       cluster-public-ip   = var.cluster_public_ip,
-      cluster-dns-name    = var.cluster_public_address
+      cluster-dns-name    = var.cluster_public_address,
     })]
   }
   provisioner "remote-exec" { inline = [file("${path.module}/scripts/prepare-kube-config-for-cluster.sh")] }
@@ -50,6 +49,8 @@ resource "null_resource" "control_plane_setup" {
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config .terraform/.kube/config-cluster" }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config-external .terraform/.kube/config-external" }
   provisioner "local-exec" { command = var.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external" }
+  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-token .terraform/.kube/join-token" }
+  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-hash .terraform/.kube/join-hash" }
 
   provisioner "remote-exec" {
     when       = destroy

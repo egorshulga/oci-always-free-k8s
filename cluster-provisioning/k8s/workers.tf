@@ -30,14 +30,21 @@ resource "null_resource" "worker_setup" {
     source      = ".terraform/.kube/config-cluster"
     destination = ".kube/config"
   }
+  provisioner "file" {
+    source      = ".terraform/.kube/join-token"
+    destination = ".kube/join-token"
+  }
+  provisioner "file" {
+    source      = ".terraform/.kube/join-hash"
+    destination = ".kube/join-hash"
+  }
   provisioner "remote-exec" { inline = [file("${path.module}/scripts/update-upgrade.sh")] }
   provisioner "remote-exec" { inline = [local.script.reset-iptables] }
   provisioner "remote-exec" { inline = [local.script.install-kubeadm] }
   provisioner "remote-exec" {
     inline = [templatefile("${path.module}/scripts/setup-worker.sh", {
-      leader_url          = var.leader.fqdn,
-      k8s_discovery_token = local.k8s_discovery_token,
-      node_name           = each.value.hostname,
+      leader_url                = var.leader.fqdn,
+      node_name                 = each.value.hostname,
     })]
   }
   provisioner "remote-exec" { inline = ["echo 'Worker init script complete'"] }
