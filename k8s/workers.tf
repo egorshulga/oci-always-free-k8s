@@ -1,12 +1,12 @@
 resource "null_resource" "worker_setup" {
-  for_each = { for worker in var.workers : worker.hostname => worker }
+  count = length(var.workers)
 
   triggers = {
     control_plane_init = null_resource.control_plane_setup.id # Workers will be init'ed after control-plane
 
-    private_ip   = each.value.private_ip
-    hostname     = each.value.hostname
-    vm_user      = each.value.vm_user
+    private_ip   = var.workers[count.index].private_ip
+    hostname     = var.workers[count.index].hostname
+    vm_user      = var.workers[count.index].vm_user
     bastion_host = var.cluster_public_ip
     ssh_key_path = var.ssh_key_path
   }
@@ -49,7 +49,7 @@ resource "null_resource" "worker_setup" {
   provisioner "remote-exec" {
     inline = [templatefile("${path.module}/scripts/setup-worker.sh", {
       leader_url = var.leader.fqdn,
-      node_name  = each.value.hostname,
+      node_name  = var.workers[count.index].hostname,
     })]
   }
   provisioner "remote-exec" { inline = ["echo 'Worker init script complete'"] }
