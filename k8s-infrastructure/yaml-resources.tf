@@ -1,8 +1,9 @@
 resource "null_resource" "k8s_infrastructure" {
   triggers = {
-    vm_user           = var.leader.vm_user
-    cluster_public_ip = var.cluster_public_ip
-    ssh_key_path      = var.ssh_key_path
+    vm_user                 = var.leader.vm_user
+    cluster_public_ip       = var.cluster_public_ip
+    cluster_public_dns_name = var.cluster_public_dns_name
+    ssh_key_path            = var.ssh_key_path
   }
 
   connection {
