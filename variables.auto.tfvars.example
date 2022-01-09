@@ -6,3 +6,10 @@ fingerprint      = "60:...:c3"
 private_key_path = "C:\\Users\\...\\.oci\\oci-tf.pem"
 ssh_key_path     = "C:\\Users\\...\\.ssh\\id_ed25519"
 ssh_key_pub_path = "C:\\Users\\...\\.ssh\\id_ed25519.pub"
+
+overwrite_local_kube_config = true
+
+# Optional, may be configured later.
+# Changes lead to k8s cluster recreation (with reusing instances).
+# cluster_public_dns_name        = "cluster.egorshul.ga"
+letsencrypt_registration_email = "user@example.com"
