@@ -37,6 +37,10 @@ resource "oci_core_instance" "leader" {
   metadata = {
     ssh_authorized_keys = file(var.ssh_key_pub_path)
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 locals {
