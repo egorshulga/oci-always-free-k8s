@@ -58,7 +58,6 @@ resource "null_resource" "control_plane_setup" {
   }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config .terraform/.kube/config-cluster" }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config-external .terraform/.kube/config-external" }
-  provisioner "local-exec" { command = var.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external" }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-token .terraform/.kube/join-token" }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-hash .terraform/.kube/join-hash" }
 
@@ -66,6 +65,17 @@ resource "null_resource" "control_plane_setup" {
     when       = destroy
     on_failure = continue
     inline     = [".kube/reset.sh"]
+  }
+}
+
+resource "null_resource" "save_kube_config" {
+  triggers = {
+    control_plane_setup         = null_resource.control_plane_setup.id,
+    overwrite_local_kube_config = var.overwrite_local_kube_config
+  }
+
+  provisioner "local-exec" {
+    command = var.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
   }
 }
 

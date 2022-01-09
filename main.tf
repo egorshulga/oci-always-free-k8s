@@ -30,7 +30,7 @@ module "compute" {
     subnet_id     = module.network.private_subnet_id
   }
   workers = {
-    count = 1
+    count = 2
     shape = "VM.Standard.A1.Flex"
     image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
     # shape = "VM.Standard.E2.1.Micro"
@@ -50,7 +50,7 @@ module "k8s" {
   load_balancer_id            = module.network.load_balancer_id
   leader                      = module.compute.leader
   workers                     = module.compute.workers
-  overwrite_local_kube_config = true
+  overwrite_local_kube_config = var.overwrite_local_kube_config
 }
 
 module "k8s_infrastructure" {

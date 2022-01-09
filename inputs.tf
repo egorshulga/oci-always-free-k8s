@@ -30,5 +30,9 @@ variable "cluster_public_dns_name" {
   type    = string
   default = null
 }
-
 variable "letsencrypt_registration_email" { type = string }
+
+variable "overwrite_local_kube_config" {
+  type = bool
+  default = false
+}
