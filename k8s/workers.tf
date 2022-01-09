@@ -27,6 +27,11 @@ resource "null_resource" "worker_setup" {
     on_failure = continue
   }
   provisioner "file" {
+    content     = templatefile("${path.module}/scripts/reset.sh", { hostname = self.triggers.hostname })
+    destination = ".kube/reset.sh"
+  }
+  provisioner "remote-exec" { inline = ["chmod 0777 .kube/reset.sh"] }
+  provisioner "file" {
     source      = ".terraform/.kube/config-cluster"
     destination = ".kube/config"
   }
@@ -43,8 +48,8 @@ resource "null_resource" "worker_setup" {
   provisioner "remote-exec" { inline = [local.script.install-kubeadm] }
   provisioner "remote-exec" {
     inline = [templatefile("${path.module}/scripts/setup-worker.sh", {
-      leader_url                = var.leader.fqdn,
-      node_name                 = each.value.hostname,
+      leader_url = var.leader.fqdn,
+      node_name  = each.value.hostname,
     })]
   }
   provisioner "remote-exec" { inline = ["echo 'Worker init script complete'"] }
@@ -53,6 +58,6 @@ resource "null_resource" "worker_setup" {
   provisioner "remote-exec" {
     when       = destroy
     on_failure = continue
-    inline = [file("${path.module}/scripts/reset.sh")]
+    inline     = [".kube/reset.sh"]
   }
 }

@@ -20,6 +20,15 @@ resource "null_resource" "control_plane_setup" {
     timeout     = "5m"
   }
   provisioner "remote-exec" { inline = ["echo 'Running leader init script'"] }
+  provisioner "remote-exec" {
+    inline     = ["mkdir .kube"]
+    on_failure = continue
+  }
+  provisioner "file" {
+    content     = templatefile("${path.module}/scripts/reset.sh", { hostname = self.triggers.hostname })
+    destination = ".kube/reset.sh"
+  }
+  provisioner "remote-exec" { inline = ["chmod 0777 .kube/reset.sh"] }
   provisioner "remote-exec" { inline = [file("${path.module}/scripts/update-upgrade.sh")] }
   provisioner "remote-exec" { inline = [local.script.reset-iptables] }
   provisioner "remote-exec" { inline = [local.script.install-kubeadm] }
@@ -55,7 +64,7 @@ resource "null_resource" "control_plane_setup" {
   provisioner "remote-exec" {
     when       = destroy
     on_failure = continue
-    inline = [file("${path.module}/scripts/reset.sh")]
+    inline     = [".kube/reset.sh"]
   }
 }
 

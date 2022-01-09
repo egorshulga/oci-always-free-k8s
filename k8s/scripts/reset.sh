@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
-kubectl drain ${self.triggers.hostname} --force --ignore-daemonsets
-kubectl delete node ${self.triggers.hostname} --force
+kubectl drain ${hostname} --force --ignore-daemonsets
+kubectl delete node ${hostname} --force
 sudo kubeadm reset --force
 
 # Recreating network
