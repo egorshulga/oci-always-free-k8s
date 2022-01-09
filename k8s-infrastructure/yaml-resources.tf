@@ -41,18 +41,23 @@ resource "null_resource" "k8s_infrastructure" {
   provisioner "remote-exec" { inline = ["kubectl apply -f .kube/ingress-controller.yaml"] }
   provisioner "remote-exec" { inline = ["kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=300s"] }
   provisioner "remote-exec" { inline = ["kubectl apply -f .kube/cert-manager.yaml"] }
-  provisioner "remote-exec" { inline = ["kubectl wait --namespace cert-manager --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=300s"] }
-  provisioner "remote-exec" { inline = ["kubectl apply -f .kube/letsencrypt-issuer.yaml"] }
+  provisioner "remote-exec" { inline = [
+    "until kubectl apply -f .kube/letsencrypt-issuer.yaml", # We need to wait until cert-manager completes initialization.
+    "do",                                                   # Unfortunately, there is no API to wait for it programmatically,
+    "  echo Retrying creation of letsencrypt cert issuer",  # that is why we try to create letsencrypt cert issuer,
+    "  sleep 10",                                           # until it succeedes (kubectl apply issuer fails with
+    "done",                                                 # 'failed calling webhook' error till cert-manager is initialized).
+  ] }
   provisioner "remote-exec" { inline = ["kubectl apply -f .kube/dashboard.yaml"] }
 
   provisioner "remote-exec" {
     when       = destroy
     on_failure = continue
     inline = [
-      "kubectl delete -f .kube/ingress-controller.yaml",
-      "kubectl delete -f .kube/cert-manager.yaml",
-      "kubectl delete -f .kube/letsencrypt-issuer.yaml",
       "kubectl delete -f .kube/dashboard.yaml",
+      "kubectl delete -f .kube/letsencrypt-issuer.yaml",
+      "kubectl delete -f .kube/cert-manager.yaml",
+      "kubectl delete -f .kube/ingress-controller.yaml",
     ]
   }
 }
