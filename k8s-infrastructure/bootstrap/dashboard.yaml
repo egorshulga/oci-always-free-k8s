@@ -317,12 +317,15 @@ metadata:
       rewrite ^(/dashboard)$ $1/ redirect;
 spec:
   ingressClassName: nginx
+${cluster_public_dns_name != null ? <<PART
   tls:
     - hosts:
-        - ${host}
+        - #{cluster_public_dns_name}
       secretName: dashboard-tls
+PART
+: "  # tls config omitted, cause no dns name provided"}
   rules:
-    - host: ${host}
+    - ${cluster_public_dns_name != null ? "host: ${cluster_public_dns_name}" : "# host name omitted, cause no dns name provided"}
       http:
         paths:
           - path: /dashboard(/|$)(.*)

@@ -1,14 +1,14 @@
 resource "null_resource" "k8s_infrastructure" {
   triggers = {
-    vm_user                = var.leader.vm_user
-    cluster_public_address = var.cluster_public_address
-    ssh_key_path           = var.ssh_key_path
+    vm_user           = var.leader.vm_user
+    cluster_public_ip = var.cluster_public_ip
+    ssh_key_path      = var.ssh_key_path
   }
 
   connection {
     type        = "ssh"
     user        = self.triggers.vm_user
-    host        = self.triggers.cluster_public_address # Load balancer public address. SSH port is configured to point to leader node (see above).
+    host        = self.triggers.cluster_public_ip # Load balancer public ip. SSH port is configured to point to leader node (see above).
     private_key = file(self.triggers.ssh_key_path)
     timeout     = "5m"
   }
@@ -33,7 +33,7 @@ resource "null_resource" "k8s_infrastructure" {
   }
   provisioner "file" {
     content = templatefile("${path.module}/bootstrap/dashboard.yaml", {
-      host = var.cluster_public_address
+      cluster_public_dns_name = var.cluster_public_dns_name
     })
     destination = ".kube/dashboard.yaml"
   }

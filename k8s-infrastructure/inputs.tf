@@ -1,5 +1,6 @@
 variable "ssh_key_path" { type = string }
-variable "cluster_public_address" { type = string }
+variable "cluster_public_ip" { type = string }
+variable "cluster_public_dns_name" { type = string }
 variable "letsencrypt_registration_email" { type = string }
 
 variable "load_balancer_id" { type = string }
