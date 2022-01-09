@@ -8,7 +8,7 @@ resource "null_resource" "k8s_infrastructure" {
   connection {
     type        = "ssh"
     user        = self.triggers.vm_user
-    host        = self.triggers.cluster_public_address # Load balancer public ip. SSH port is configured to point to leader node (see above).
+    host        = self.triggers.cluster_public_address # Load balancer public address. SSH port is configured to point to leader node (see above).
     private_key = file(self.triggers.ssh_key_path)
     timeout     = "5m"
   }

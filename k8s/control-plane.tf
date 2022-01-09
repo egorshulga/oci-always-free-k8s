@@ -7,7 +7,7 @@ resource "null_resource" "control_plane_setup" {
     lb_backend  = var.leader.ssh_lb.backend_id  # - LB forwarder has set-up.
 
     vm_user                = var.leader.vm_user
-    cluster_public_address = local.cluster_public_address
+    cluster_public_address = var.cluster_public_ip
     ssh_key_path           = var.ssh_key_path
     hostname               = var.leader.hostname
   }
