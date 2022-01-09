@@ -320,7 +320,7 @@ spec:
 ${cluster_public_dns_name != null ? <<PART
   tls:
     - hosts:
-        - #{cluster_public_dns_name}
+        - ${cluster_public_dns_name}
       secretName: dashboard-tls
 PART
 : "  # tls config omitted, cause no dns name provided"}
