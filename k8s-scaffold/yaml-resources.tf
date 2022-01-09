@@ -1,4 +1,4 @@
-resource "null_resource" "k8s_infrastructure" {
+resource "null_resource" "scaffold" {
   triggers = {
     vm_user                 = var.leader.vm_user
     cluster_public_ip       = var.cluster_public_ip
@@ -19,21 +19,21 @@ resource "null_resource" "k8s_infrastructure" {
     on_failure = continue
   }
   provisioner "file" {
-    source      = "${path.module}/bootstrap/ingress-controller.yaml"
+    source      = "${path.module}/apps/ingress-controller.yaml"
     destination = ".kube/ingress-controller.yaml"
   }
   provisioner "file" {
-    source      = "${path.module}/bootstrap/cert-manager.yaml"
+    source      = "${path.module}/apps/cert-manager.yaml"
     destination = ".kube/cert-manager.yaml"
   }
   provisioner "file" {
-    content = templatefile("${path.module}/bootstrap/letsencrypt-issuer.yaml", {
+    content = templatefile("${path.module}/apps/letsencrypt-issuer.yaml", {
       letsencrypt_registration_email = var.letsencrypt_registration_email
     })
     destination = ".kube/letsencrypt-issuer.yaml"
   }
   provisioner "file" {
-    content = templatefile("${path.module}/bootstrap/dashboard.yaml", {
+    content = templatefile("${path.module}/apps/dashboard.yaml", {
       cluster_public_dns_name = var.cluster_public_dns_name
     })
     destination = ".kube/dashboard.yaml"

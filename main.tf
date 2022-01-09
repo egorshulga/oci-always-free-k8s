@@ -53,8 +53,8 @@ module "k8s" {
   overwrite_local_kube_config = var.overwrite_local_kube_config
 }
 
-module "k8s_infrastructure" {
-  source                         = "./k8s-infrastructure"
+module "k8s_scaffold" {
+  source                         = "./k8s-scaffold"
   depends_on                     = [module.k8s]
   ssh_key_path                   = var.ssh_key_path
   cluster_public_ip              = module.network.reserved_public_ip.ip_address
