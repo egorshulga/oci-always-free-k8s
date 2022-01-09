@@ -319,10 +319,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - cluster.egorshulga.tk
+        - ${host}
       secretName: dashboard-tls
   rules:
-    - host: cluster.egorshulga.tk
+    - host: ${host}
       http:
         paths:
           - path: /dashboard(/|$)(.*)
