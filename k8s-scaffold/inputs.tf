@@ -7,6 +7,7 @@ variable "load_balancer_id" { type = string }
 
 variable "leader" {
   type = object({
+    id      = string
     vm_user = string
   })
 }
