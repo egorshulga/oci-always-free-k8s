@@ -17,3 +17,8 @@ variable "workers" {
     id = string
   }))
 }
+
+variable "debug_create_cluster_admin" {
+  type    = bool
+  default = false
+}

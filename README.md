@@ -96,6 +96,11 @@ git clone https://github.com/egorshulga/oci-always-free-k8s && cd oci-always-fre
     <td>false</td>
     <td>Whether local kube config (%USERPROFILE%\.kube\config) should be overwritten with a new one from the newly created cluster.</td>
   </tr>
+  <tr>
+    <td>debug_create_cluster_admin</td>
+    <td>false</td>
+    <td>Whether admin should be created in the cluster and its token printed to output (to access dashboard right after cluster creation).</td>
+  </tr>
 </tbody>
 </table>
 

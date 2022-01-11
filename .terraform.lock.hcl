@@ -37,3 +37,24 @@ provider "registry.terraform.io/hashicorp/oci" {
     "zh:f6c3c6397660d0b0537457dce465a9f6b6a95a5b1f6c0988d1996d115ebc835c",
   ]
 }
+
+provider "registry.terraform.io/tenstad/remote" {
+  version     = "0.0.22"
+  constraints = "0.0.22"
+  hashes = [
+    "h1:xmx28z97fTmWnJ9VRIsm3XEiDpEOeD9OdJSV2k60ARU=",
+    "zh:019ed6805b17d86b412a3bcf68f1ce9f5bd8b4440a989dde67ac04bd7fa11c44",
+    "zh:044eaa9a1d3845cb8d77c42058642543f95b255da4842f95225b4be9f8689cde",
+    "zh:1a6e92349f2a7b2d31cd3359bbaf2e2d52285a6024a8150c3ec8f6293c2789c0",
+    "zh:2da5c88acdc3b731401599bd0f5f0f87419a376ed6303ac1c39c166e8166f656",
+    "zh:2dbe8bef18f29d4a6dcd953bd9b1ba244ed40ab90026376ee2086abc5f13e828",
+    "zh:2f81ef960569e8ebc806ea6216fb81101b0e9521bea55301a1574857a137bd24",
+    "zh:4434c90bdd5a8e199fb7fa7779ed7a32a4a734b73dc5d135795dbb0f91067ee7",
+    "zh:645b3447d76f5f3d6a1f75a8bdc8eca9db719a1f0da13ef6725ae789f02c6189",
+    "zh:77a9a7fe4ed416e05266b01c00e27e61bd597d6bde154fc7e1083a9bc5c1936f",
+    "zh:c3e54e794289317a4b67aa9da9e405e106a05da34b6ae6178792f9e8e9a9485e",
+    "zh:ceb49c886bc775daad4da1685b160cf216183d436fbef2771809aa041def34f3",
+    "zh:cf476205e0ba28d585e14c94a9f3f508b48fcf1018cdcc59535f306b929637b0",
+    "zh:f879cd606fc3af473f187ffe86f4e0db1f5d73d1c3af2eac0017758b574e3345",
+  ]
+}

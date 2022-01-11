@@ -63,6 +63,7 @@ module "k8s_scaffold" {
   load_balancer_id               = module.network.load_balancer_id
   leader                         = module.compute.leader
   workers                        = module.compute.workers
+  debug_create_cluster_admin     = var.debug_create_cluster_admin
 }
 
 output "cluster_public_ip" {
@@ -71,4 +72,8 @@ output "cluster_public_ip" {
 
 output "cluster_public_address" {
   value = var.cluster_public_dns_name
+}
+
+output "admin_token" {
+  value = module.k8s_scaffold.admin_token
 }

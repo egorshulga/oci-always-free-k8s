@@ -16,6 +16,10 @@ ssh_key_pub_path = "C:\\Users\\...\\.ssh\\id_ed25519.pub"
 # Is used to configure LetsEncrypt certificates issuer
 letsencrypt_registration_email = "user@example.com"
 
+# Whether to create cluster admin (and output his token)
+# to access dashboard right after cluster creation.
+debug_create_cluster_admin = false
+
 # Whether existing local kube config (%USERPROFILE%\.kube\config)
 # should be overwritten with the one from the newly created cluster.
 windows_overwrite_local_kube_config = false
