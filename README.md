@@ -192,6 +192,15 @@ Do you want to perform these actions?
   ```
 </details>
 
+4. SSH to the leader instance
+
+```
+> ssh ubuntu@{cluster-public-ip}
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.11.0-1022-oracle aarch64)
+This is a leader instance, which was provisioned by Terraform
+ubuntu@leader:~$
+```
+
 ## Used resources
 
 TODO
