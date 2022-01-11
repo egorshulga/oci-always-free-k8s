@@ -70,12 +70,12 @@ resource "null_resource" "control_plane_setup" {
 
 resource "null_resource" "save_kube_config" {
   triggers = {
-    control_plane_setup         = null_resource.control_plane_setup.id,
-    overwrite_local_kube_config = var.overwrite_local_kube_config
+    control_plane_setup                 = null_resource.control_plane_setup.id,
+    windows_overwrite_local_kube_config = var.windows_overwrite_local_kube_config
   }
 
   provisioner "local-exec" {
-    command = var.overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
+    command = var.windows_overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
   }
 }
 

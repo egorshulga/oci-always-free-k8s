@@ -1,15 +1,21 @@
-region       = "eu-amsterdam-1"
-tenancy_ocid = "ocid1.tenancy.oc1..."
-user_ocid    = "ocid1.user.oc1..."
-
+# OCI API configuration
+region           = "uk-london-1"
+tenancy_ocid     = "ocid1.tenancy.oc1..."
+user_ocid        = "ocid1.user.oc1..."
 fingerprint      = "60:...:c3"
 private_key_path = "C:\\Users\\...\\.oci\\oci-tf.pem"
+
+# SSH keys - used to access generated instances
 ssh_key_path     = "C:\\Users\\...\\.ssh\\id_ed25519"
 ssh_key_pub_path = "C:\\Users\\...\\.ssh\\id_ed25519.pub"
 
-overwrite_local_kube_config = true
+# Optional, DNS name may be configured later.
+# Changes lead to k8s cluster recreation (instances are preserved).
+# cluster_public_dns_name = "cluster.example.com"
 
-# Optional, may be configured later.
-# Changes lead to k8s cluster recreation (with reusing instances).
-# cluster_public_dns_name        = "cluster.egorshul.ga"
+# Is used to configure LetsEncrypt certificates issuer
 letsencrypt_registration_email = "user@example.com"
+
+# Whether existing local kube config (%USERPROFILE%\.kube\config)
+# should be overwritten with the one from the newly created cluster.
+windows_overwrite_local_kube_config = false

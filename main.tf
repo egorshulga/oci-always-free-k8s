@@ -43,14 +43,14 @@ module "compute" {
 }
 
 module "k8s" {
-  source                      = "./k8s"
-  ssh_key_path                = var.ssh_key_path
-  cluster_public_ip           = module.network.reserved_public_ip.ip_address
-  cluster_public_dns_name     = var.cluster_public_dns_name
-  load_balancer_id            = module.network.load_balancer_id
-  leader                      = module.compute.leader
-  workers                     = module.compute.workers
-  overwrite_local_kube_config = var.overwrite_local_kube_config
+  source                              = "./k8s"
+  ssh_key_path                        = var.ssh_key_path
+  cluster_public_ip                   = module.network.reserved_public_ip.ip_address
+  cluster_public_dns_name             = var.cluster_public_dns_name
+  load_balancer_id                    = module.network.load_balancer_id
+  leader                              = module.compute.leader
+  workers                             = module.compute.workers
+  windows_overwrite_local_kube_config = var.windows_overwrite_local_kube_config
 }
 
 module "k8s_scaffold" {

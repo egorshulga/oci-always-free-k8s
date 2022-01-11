@@ -6,7 +6,7 @@ variable "cluster_public_dns_name" {
   default = null
 }
 variable "load_balancer_id" { type = string }
-variable "overwrite_local_kube_config" {
+variable "windows_overwrite_local_kube_config" {
   type    = bool
   default = false
 }
