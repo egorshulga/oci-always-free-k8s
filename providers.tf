@@ -6,10 +6,6 @@ terraform {
     null = {
       version = "3.1.0"
     }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "1.13.1"
-    }
   }
 }
 
@@ -20,9 +16,4 @@ provider "oci" {
   private_key_path     = var.private_key_path
   private_key_password = var.private_key_password
   region               = var.region
-}
-
-provider "kubectl" {
-  host        = "https://${module.k8s.cluster_public_address}:6443"
-  config_path = ".terraform/.kube/config-external"
 }
