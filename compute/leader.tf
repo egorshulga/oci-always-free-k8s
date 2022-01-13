@@ -28,7 +28,7 @@ resource "oci_core_instance" "leader" {
   }
 
   create_vnic_details {
-    assign_public_ip          = false
+    assign_public_ip          = var.leader.assign_public_ip
     subnet_id                 = var.leader.subnet_id
     assign_private_dns_record = true
     hostname_label            = var.leader.hostname

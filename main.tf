@@ -24,10 +24,11 @@ module "compute" {
     image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
     # shape = "VM.Standard.E2.1.Micro"
     # image = "Canonical-Ubuntu-20.04-2021.12.01-0"
-    ocpus         = 1
-    memory_in_gbs = 3
-    hostname      = "leader"
-    subnet_id     = module.network.private_subnet_id
+    ocpus            = 1
+    memory_in_gbs    = 3
+    hostname         = "leader"
+    subnet_id        = module.network.private_subnet_id
+    assign_public_ip = false
   }
   workers = {
     count = 3
@@ -35,10 +36,11 @@ module "compute" {
     image = "Canonical-Ubuntu-20.04-aarch64-2021.12.01-0"
     # shape = "VM.Standard.E2.1.Micro"
     # image = "Canonical-Ubuntu-20.04-2021.12.01-0"
-    ocpus         = 1
-    memory_in_gbs = 7
-    base_hostname = "worker"
-    subnet_id     = module.network.private_subnet_id
+    ocpus            = 1
+    memory_in_gbs    = 7
+    base_hostname    = "worker"
+    subnet_id        = module.network.private_subnet_id
+    assign_public_ip = false
   }
 }
 
