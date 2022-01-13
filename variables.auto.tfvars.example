@@ -1,8 +1,8 @@
 # OCI API configuration
-region           = "uk-london-1"
-tenancy_ocid     = "ocid1.tenancy.oc1..."
 user_ocid        = "ocid1.user.oc1..."
 fingerprint      = "60:...:c3"
+tenancy_ocid     = "ocid1.tenancy.oc1..."
+region           = "uk-london-1"
 private_key_path = "C:\\Users\\...\\.oci\\oci-tf.pem"
 
 # SSH keys - used to access generated instances
