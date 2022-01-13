@@ -10,8 +10,7 @@ module "network" {
   region                   = var.region
   vcn_dns_label            = "vcn"
   public_subnet_dns_label  = "public"
-  provision_private_subnet = true
-  private_subnet_dns_label = "private"
+  provision_private_subnet = false
 }
 
 module "compute" {
@@ -28,8 +27,8 @@ module "compute" {
     ocpus            = 1
     memory_in_gbs    = 3
     hostname         = "leader"
-    subnet_id        = module.network.private_subnet_id
-    assign_public_ip = false
+    subnet_id        = module.network.public_subnet_id
+    assign_public_ip = true
   }
   workers = {
     count = 3
@@ -40,8 +39,8 @@ module "compute" {
     ocpus            = 1
     memory_in_gbs    = 7
     base_hostname    = "worker"
-    subnet_id        = module.network.private_subnet_id
-    assign_public_ip = false
+    subnet_id        = module.network.public_subnet_id
+    assign_public_ip = true
   }
 }
 
