@@ -11,6 +11,7 @@ variable "public_subnet_dns_label" {
   default = "public"
 }
 
+variable "provision_private_subnet" { type = bool }
 variable "private_subnet_dns_label" {
   type    = string
   default = "private"

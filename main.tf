@@ -10,6 +10,7 @@ module "network" {
   region                   = var.region
   vcn_dns_label            = "vcn"
   public_subnet_dns_label  = "public"
+  provision_private_subnet = true
   private_subnet_dns_label = "private"
 }
 

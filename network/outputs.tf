@@ -3,7 +3,7 @@ output "public_subnet_id" {
 }
 
 output "private_subnet_id" {
-  value = oci_core_subnet.private.id
+  value = length(oci_core_subnet.private) > 0 ? oci_core_subnet.private[0].id : null
 }
 
 output "reserved_public_ip" {
