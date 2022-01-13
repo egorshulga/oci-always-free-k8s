@@ -1,5 +1,6 @@
 resource "null_resource" "admin" {
-  count = var.debug_create_cluster_admin ? 1 : 0
+  count      = var.debug_create_cluster_admin ? 1 : 0
+  depends_on = [null_resource.scaffold]
 
   triggers = {
     leader_id               = var.leader.id
