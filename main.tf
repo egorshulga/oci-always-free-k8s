@@ -1,12 +1,15 @@
-module "governance" {
-  source           = "./governance"
-  tenancy_ocid     = var.tenancy_ocid
-  compartment_name = "terraformed"
+module "compartment" {
+  source       = "./compartment"
+  tenancy_ocid = var.tenancy_ocid
+  compartment = {
+    name        = "terraformed"
+    description = "Compartment for Terraform'ed resources"
+  }
 }
 
 module "network" {
   source                   = "./network"
-  compartment_id           = module.governance.compartment_id
+  compartment_id           = module.compartment.id
   region                   = var.region
   vcn_dns_label            = "vcn"
   public_subnet_dns_label  = "public"
@@ -16,7 +19,7 @@ module "network" {
 
 module "compute" {
   source           = "./compute"
-  compartment_id   = module.governance.compartment_id
+  compartment_id   = module.compartment.id
   ssh_key_pub_path = var.ssh_key_pub_path
   load_balancer_id = module.network.load_balancer_id
 
