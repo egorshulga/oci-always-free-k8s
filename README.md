@@ -2,7 +2,7 @@
 
 ## Getting started
 
-1. Sign up to Oracle Cloud [here](https://www.oracle.com/cloud/free/).
+1. Sign up to Oracle Cloud [here](https://www.oracle.com/cloud/free/). Make a wise choice about a home region, as it can't be changed in the future, and Always Free tier tenants can not use other regions to provision resources. Prefer regions with multiple availability domains. Check out the list [here](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#:~:text=the%20following%20table%20lists%20the%20regions%20in%20the%20oracle%20cloud%20infrastructure%20commercial%20realm).
 
 2. Download [Terraform CLI](https://www.terraform.io/downloads) and make it available in path. Check terraform is installed with `terraform -v`.
 
@@ -179,9 +179,10 @@ Do you want to perform these actions?
 
 1. Open output value of `cluster_public_ip` in browser. Nginx should show page 404.
 
-2. If you've set up a public dns name, go to http://{cluster_public_address}/dashboard. It should redirect to https and open a k8s dashboard login page. Https connection should be established successfully, browser should show a secure lock icon in address bar, certificate should be correctly issued by LetsEncrypt.
+2. If you've set up a public dns name, go to `http://{cluster_public_address}/dashboard`. It should redirect to https and open a k8s dashboard login page. Https connection should be established successfully, browser should show a secure lock icon in address bar, meaning that a certificate is correctly issued by LetsEncrypt.
 
 3. Run `kubectl cluster-info && kubectl get nodes`
+
 <details> <summary>Example output</summary>
 
   ```
@@ -199,25 +200,194 @@ Do you want to perform these actions?
 
 4. SSH to the leader instance
 
+<details> <summary>Example output</summary>
+
 ```
 > ssh ubuntu@{cluster-public-ip}
 Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.11.0-1022-oracle aarch64)
 This is a leader instance, which was provisioned by Terraform
 ubuntu@leader:~$
 ```
+</details>
 
-## Used resources
+5. SSH to worker instances. This can be achieved by connecting to workers via leader instance, which acts as a bastion.
 
-TODO
+<details> <summary>Example output</summary>
+
+```
+> ssh -J ubuntu@{cluster-public-ip} ubuntu@worker-0.private.vcn.oraclevcn.com
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.11.0-1022-oracle aarch64)
+This is a worker instance, which was provisioned by Terraform
+ubuntu@worker-0:~$
+```
+</details>
+
+## Consumed Oracle Cloud resources
+
+That is a list of Oracle Cloud resources, that are provisioned as a result of applying the script. Limits are provided for reference, they are up to date as of January 14 2022.
+
+Please note that if you already have some resources in your tenancy, then scripts may fail due to limits imposed by Oracle. You may need to change some resources values (e.g. change count of provisioned workers in [main.tf](main.tf)).
+
+<table>
+<thead>
+  <tr>
+    <th>Module<br>(as in source code)</th>
+    <th>Resource</th>
+    <th>Used Count</th>
+    <th>Service Limit</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td colspan="2">Compartment</td>
+    <td>1</td>
+    <td>1000</td>
+    <td>Separate compartment is created to hold all of the provisioned resources.</td>
+  </tr>
+  <tr>
+    <td rowspan="7">Network</td>
+    <td>VCN</td>
+    <td>1</td>
+    <td>50</td>
+    <td>Compute instances are connected to a Virtual Cloud Network.</td>
+  </tr>
+  <tr>
+    <td>Subnet</td>
+    <td>2</td>
+    <td>300 (per VCN)</td>
+    <td>VCN is configured to have one public and one private subnet. Compute instances are connected to a private subnet (thus closing direct access from/to the internet).</td>
+  </tr>
+  <tr>
+    <td>Network Load Balancer</td>
+    <td>1</td>
+    <td>3</td>
+    <td>Network Load Balancer serves as an entry point for requests coming to the cluster. It works on OSI layers 3/4, and it has no bandwidth configuration requirement. It is connected to a public subnet.</td>
+  </tr>
+  <tr>
+    <td>Reserved Public IP</td>
+    <td>1</td>
+    <td>50</td>
+    <td>Reserved public IP is assigned to a Network Load Balancer.</td>
+  </tr>
+  <tr>
+    <td>Internet Gateway</td>
+    <td>1</td>
+    <td>1 (per VCN)</td>
+    <td>Internet gateway enables internet connectivity for resources in a public subnet.</td>
+  </tr>
+  <tr>
+    <td>NAT Gateway</td>
+    <td>1</td>
+    <td>1 (per VCN)</td>
+    <td>NAT gateway enables outbound internet connectivity for resources in a private subnet.</td>
+  </tr>
+  <tr>
+    <td>Service Gateway</td>
+    <td>1</td>
+    <td>1 (per VCN)</td>
+    <td>Service gateway enables private subnet resources to access Oracle infrastructure (e.g. for metrics collection).</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Compute</td>
+    <td>Cores for Standard.A1 VMs</td>
+    <td>4</td>
+    <td>4</td>
+    <td rowspan="2">Provisioned resources include 4 ARM-based VMs. Each one has 1 OCPU. Leader instance has 2 GB of memory. There are 3 workers, each one has 7 GB of memory.</td>
+  </tr>
+  <tr>
+    <td>Memory for Standard.A1 VMs</td>
+    <td>24</td>
+    <td>24</td>
+  </tr>
+</tbody>
+</table>
+
+## K8s infrastructure
+
+The script provisions a K8s cluster on the leader and worker VMs. This is a list of resources that are available in the K8s cluster once it is provisioned.
+
+<table>
+<thead>
+  <tr>
+    <th>Resource</th>
+    <th>Name</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Network plugin</td>
+    <td>Flannel</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Ingress controller</td>
+    <td><a href="https://kubernetes.github.io/ingress-nginx/" target="_blank" rel="noopener noreferrer">kubernetes/ingress-nginx</a></td>
+    <td>Service is deployed via a NodePort (see ports below)</td>
+  </tr>
+  <tr>
+    <td>ClusterIssuer</td>
+    <td>LetsEncrypt</td>
+    <td>Uses <a href="https://github.com/jetstack/cert-manager" target="_blank" rel="noopener noreferrer">cert-manager</a></td>
+  </tr>
+  <tr>
+    <td>Dashboard</td>
+    <td><a href="https://github.com/kubernetes/dashboard" target="_blank" rel="noopener noreferrer">kubernetes/dashboard</a></td>
+    <td>Available on https://{cluster-ip}/dashboard/ or https://{cluster-dns-name}/dashboard/ (the latter uses a LetsEncrypt certificate)</td>
+  </tr>
+</tbody>
+</table>
+
+## Cluster connectivity
+
+As all of the compute instances are connected to a private subnet, it required a NAT gateway for outbound internet connections. There are no egress security rules imposed (outgoing connections are allowed to go to `0.0.0.0/0`).
+
+Ingress connectivity is achieved via Network Load Balancer, which is available from the internet via public IP. Below there is a list of open ports. There are no security rules to limit source IPs (incoming connections are allowed to originate from `0.0.0.0/0`).
+
+<table>
+<thead>
+  <tr>
+    <th>Port</th>
+    <th>Protocol</th>
+    <th>Destination</th>
+    <th>Destination port</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>22</td>
+    <td>TCP</td>
+    <td rowspan="2">Leader instance</td>
+    <td>22</td>
+    <td>SSH to leader. Can also be used to connect to worker instances (using the leader as a bastion).</td>
+  </tr>
+  <tr>
+    <td>6443</td>
+    <td>TCP</td>
+    <td>6443</td>
+    <td>Kubectl to K8s control plane (deployed on a leader instance). Kube config is pulled after spinning up the control plane</td>
+  </tr>
+  <tr>
+    <td>80</td>
+    <td>TCP</td>
+    <td rowspan="2">Workers</td>
+    <td>30080</td>
+    <td rowspan="2">Forwarding HTTP and HTTPS traffic to NGINX ingress-controller, which is exposed with NodePorts on worker instances. HTTPS offloading is performed by ingress-controller via LetsEncrypt's issued certificate.</td>
+  </tr>
+  <tr>
+    <td>443</td>
+    <td>TCP</td>
+    <td>30443</td>
+  </tr>
+</tbody>
+</table>
 
 ## Troubleshooting
 
-TODO
+### Out of host capacity
 
-## Contributing
+This error means that Oracle has run out of free ARM compute resources in the region that the tenant is created in.
 
-TODO
-
-## License
-
-TODO
+Possible workarounds could be to switch to another availability domain for provisioning compute resources (see [main.tf](main.tf)), or retry cluster provisioning in some days (as Oracle pledges to deploy new capacity over time).
