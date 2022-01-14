@@ -26,3 +26,8 @@ variable "workers" {
     assign_public_ip = bool
   })
 }
+
+variable "availability_domain" {
+  type    = number
+  default = 0
+}
