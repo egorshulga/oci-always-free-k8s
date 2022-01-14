@@ -254,9 +254,9 @@ Please note that if you already have some resources in your tenancy, then script
   </tr>
   <tr>
     <td>Subnet</td>
-    <td>2</td>
+    <td>1</td>
     <td>300 (per VCN)</td>
-    <td>VCN is configured to have one public and one private subnet. Compute instances are connected to a private subnet (thus closing direct access from/to the internet).</td>
+    <td>VCN is configured to have a public subnet.</td>
   </tr>
   <tr>
     <td>Network Load Balancer</td>
@@ -267,8 +267,14 @@ Please note that if you already have some resources in your tenancy, then script
   <tr>
     <td>Reserved Public IP</td>
     <td>1</td>
-    <td>50</td>
+    <td>1</td>
     <td>Reserved public IP is assigned to a Network Load Balancer.</td>
+  </tr>
+  <tr>
+    <td>Ephemeral Public IP</td>
+    <td>4</td>
+    <td>6 (?)</td>
+    <td>Ephemeral public IPs are assigne to VMs.</td>
   </tr>
   <tr>
     <td>Internet Gateway</td>
@@ -278,15 +284,15 @@ Please note that if you already have some resources in your tenancy, then script
   </tr>
   <tr>
     <td>NAT Gateway</td>
-    <td>1</td>
-    <td>1 (per VCN)</td>
-    <td>NAT gateway enables outbound internet connectivity for resources in a private subnet.</td>
+    <td>0</td>
+    <td>0</td>
+    <td>NAT gateway enables outbound internet connectivity for resources in a private subnet. It is not available in Always Free tier (as of January 2022).</td>
   </tr>
   <tr>
     <td>Service Gateway</td>
-    <td>1</td>
-    <td>1 (per VCN)</td>
-    <td>Service gateway enables private subnet resources to access Oracle infrastructure (e.g. for metrics collection).</td>
+    <td>0</td>
+    <td>0</td>
+    <td>Service gateway enables private subnet resources to access Oracle infrastructure (e.g. for metrics collection). It is not available in Always Free tier (as of January 2022).</td>
   </tr>
   <tr>
     <td rowspan="2">Compute</td>
@@ -302,6 +308,16 @@ Please note that if you already have some resources in your tenancy, then script
   </tr>
 </tbody>
 </table>
+
+## Network considerations for Always Free tier
+
+As of January 2022 Oracle _does not_ allow creation of NAT and Service gateways in VCNs, which makes private subnets effectively unusable (as without a NAT gateway they cannot access the internet, and without Service gateway Oracle cannot collect metrics from instances).
+
+That is why in the Always Free tier private subnet is not created. Instead, all compute resources are connected to a public subnet. To allow connections to the Internet, they are assigned with ephemeral public IPs.
+
+Load balancer is also assigned with a reserved public IP, so all of the traffic is still balanced between workers.
+
+When the account is switched from the Always Free tier to Pay-as-you-go, the limitation is removed, which allows us to provision proper private subnet, and to hide compute instances from being directly accesible from the internet.
 
 ## K8s infrastructure
 
@@ -383,6 +399,7 @@ Ingress connectivity is achieved via Network Load Balancer, which is available f
   </tr>
 </tbody>
 </table>
+
 
 ## Troubleshooting
 
