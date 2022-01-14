@@ -18,10 +18,11 @@ module "network" {
 }
 
 module "compute" {
-  source           = "./compute"
-  compartment_id   = module.compartment.id
-  ssh_key_pub_path = var.ssh_key_pub_path
-  load_balancer_id = module.network.load_balancer_id
+  source              = "./compute"
+  compartment_id      = module.compartment.id
+  ssh_key_pub_path    = var.ssh_key_pub_path
+  load_balancer_id    = module.network.load_balancer_id
+  availability_domain = 0
 
   leader = {
     shape = "VM.Standard.A1.Flex"
