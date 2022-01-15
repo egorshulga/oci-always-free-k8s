@@ -248,7 +248,7 @@ Please note that if you already have some resources in your tenancy, then the sc
     <td>Separate compartment is created to hold all of the provisioned resources.</td>
   </tr>
   <tr>
-    <td rowspan="7">Network</td>
+    <td rowspan="8">Network</td>
     <td>VCN</td>
     <td>1</td>
     <td>50</td>
@@ -275,8 +275,8 @@ Please note that if you already have some resources in your tenancy, then the sc
   <tr>
     <td>Ephemeral Public IP</td>
     <td>4</td>
-    <td>6 (?)</td>
-    <td>Ephemeral public IPs are assigne to VMs.</td>
+    <td>1 (per VNIC), 2 (per VM)</td>
+    <td>Ephemeral public IPs are assigned to VMs.</td>
   </tr>
   <tr>
     <td>Internet Gateway</td>
@@ -317,7 +317,7 @@ As of January 2022 Oracle _does not_ allow creation of NAT and Service gateways 
 
 That is why in the Always Free tier private subnet is not created. Instead, all compute resources are connected to a public subnet. To allow connections to the Internet, they are assigned with ephemeral public IPs.
 
-Load balancer is also assigned with a reserved public IP, so all of the traffic is still balanced between workers.
+Load balancer is assigned with a reserved public IP, so all of the traffic is still balanced between workers.
 
 When the account is switched from the Always Free tier to Pay-as-you-go, the limitation is removed, which allows us to provision proper private subnet, and to hide compute instances from being directly accesible from the internet.
 
