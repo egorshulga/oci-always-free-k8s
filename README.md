@@ -2,7 +2,9 @@
 
 ## Getting started
 
-1. Sign up to Oracle Cloud [here](https://www.oracle.com/cloud/free/). Make a wise choice about a home region, as it can't be changed in the future, and Always Free tier tenants can not use other regions to provision resources. Prefer regions with multiple availability domains. Check out the list [here](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#:~:text=the%20following%20table%20lists%20the%20regions%20in%20the%20oracle%20cloud%20infrastructure%20commercial%20realm).
+1. Sign up to Oracle Cloud [here](https://www.oracle.com/cloud/free/). 
+
+Choose home region carefully, as it can't be changed in the future, and Always Free tier tenants can't use other regions to provision resources. Prefer regions with multiple availability domains. Check out the list [here](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#:~:text=the%20following%20table%20lists%20the%20regions%20in%20the%20oracle%20cloud%20infrastructure%20commercial%20realm).
 
 2. Download [Terraform CLI](https://www.terraform.io/downloads) and make it available in path. Check terraform is installed with `terraform -v`.
 
@@ -224,9 +226,9 @@ ubuntu@worker-0:~$
 
 ## Consumed Oracle Cloud resources
 
-That is a list of Oracle Cloud resources, that are provisioned as a result of applying the script. Limits are provided for reference, they are up to date as of January 14 2022.
+Below you can see a list of Oracle Cloud resources, that are provisioned as a result of applying the scripts. Limits are provided for reference, they are up to date as of January 14, 2022.
 
-Please note that if you already have some resources in your tenancy, then scripts may fail due to limits imposed by Oracle. You may need to change some resources values (e.g. change count of provisioned workers in [main.tf](main.tf)).
+Please note that if you already have some resources in your tenancy, then the scripts may fail due to limits imposed by Oracle. You may need to change some resources values (e.g. change count of provisioned workers in [main.tf](main.tf)).
 
 <table>
 <thead>
@@ -305,7 +307,7 @@ Please note that if you already have some resources in your tenancy, then script
 
 ## K8s infrastructure
 
-The script provisions a K8s cluster on the leader and worker VMs. This is a list of resources that are available in the K8s cluster once it is provisioned.
+The script provisions a K8s cluster on the leader and worker VMs. Below you can see a list of resources that are available in the K8s cluster once it is provisioned.
 
 <table>
 <thead>
@@ -388,6 +390,6 @@ Ingress connectivity is achieved via Network Load Balancer, which is available f
 
 ### Out of host capacity
 
-This error means that Oracle has run out of free ARM compute resources in the region that the tenant is created in.
+This error means that Oracle has run out of free ARM compute resources in selected region.
 
-Possible workarounds could be to switch to another availability domain for provisioning compute resources (see [main.tf](main.tf)), or retry cluster provisioning in some days (as Oracle pledges to deploy new capacity over time).
+Possible workaround could be to switch to another availability domain for provisioning compute resources (see [main.tf](main.tf)), or to retry cluster provisioning in some days (as Oracle promises to deploy new capacity over time).
