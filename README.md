@@ -390,6 +390,8 @@ Ingress connectivity is achieved via Network Load Balancer, which is available f
 
 ### Out of host capacity
 
+![image](https://user-images.githubusercontent.com/6253488/149601001-cda85054-d43d-4c50-a373-14e1e5343197.png)
+
 This error means that Oracle has run out of free ARM compute resources in selected region.
 
 Possible workaround could be to switch to another availability domain for provisioning compute resources (see [main.tf](main.tf)), or to retry cluster provisioning in some days (as Oracle promises to deploy new capacity over time).
