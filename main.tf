@@ -62,7 +62,6 @@ module "k8s" {
 
 module "k8s_scaffold" {
   source                         = "./k8s-scaffold"
-  depends_on                     = [module.k8s]
   ssh_key_path                   = var.ssh_key_path
   cluster_public_ip              = module.network.reserved_public_ip.ip_address
   cluster_public_dns_name        = var.cluster_public_dns_name
@@ -70,6 +69,7 @@ module "k8s_scaffold" {
   load_balancer_id               = module.network.load_balancer_id
   leader                         = module.compute.leader
   workers                        = module.compute.workers
+  control_plane_setup            = module.k8s.control_plane_setup
   debug_create_cluster_admin     = var.debug_create_cluster_admin
 }
 
