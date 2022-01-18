@@ -7,7 +7,6 @@ variable "load_balancer_id" { type = string }
 
 variable "leader" {
   type = object({
-    id      = string
     vm_user = string
   })
 }
@@ -17,6 +16,8 @@ variable "workers" {
     id = string
   }))
 }
+
+variable "control_plane_setup" { type = string }
 
 variable "debug_create_cluster_admin" {
   type    = bool

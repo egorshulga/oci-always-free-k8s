@@ -1,6 +1,6 @@
 resource "null_resource" "scaffold" {
   triggers = {
-    leader_id               = var.leader.id
+    control_plane_setup     = var.control_plane_setup
     vm_user                 = var.leader.vm_user
     cluster_public_ip       = var.cluster_public_ip
     cluster_public_dns_name = var.cluster_public_dns_name
