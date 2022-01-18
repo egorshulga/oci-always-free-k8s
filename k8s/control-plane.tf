@@ -52,6 +52,18 @@ resource "null_resource" "control_plane_setup" {
   provisioner "remote-exec" { inline = ["echo 'Leader init script complete'"] }
   provisioner "remote-exec" { inline = ["sudo bash -c \"echo 'This is a leader instance, which was provisioned by Terraform on $(date)' >> /etc/motd\""] }
 
+  provisioner "remote-exec" {
+    when       = destroy
+    on_failure = continue
+    inline     = [".kube/reset.sh"]
+  }
+}
+
+resource "null_resource" "copy_configs_from_control_plane" {
+  triggers = {
+    control_plane_setup = null_resource.control_plane_setup.id,
+  }
+
   provisioner "local-exec" {
     command    = "mkdir .terraform\\.kube"
     on_failure = continue
@@ -60,17 +72,11 @@ resource "null_resource" "control_plane_setup" {
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config-external .terraform/.kube/config-external" }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-token .terraform/.kube/join-token" }
   provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-hash .terraform/.kube/join-hash" }
-
-  provisioner "remote-exec" {
-    when       = destroy
-    on_failure = continue
-    inline     = [".kube/reset.sh"]
-  }
 }
 
 resource "null_resource" "save_kube_config" {
   triggers = {
-    control_plane_setup                 = null_resource.control_plane_setup.id,
+    copy_configs_from_control_plane     = null_resource.copy_configs_from_control_plane.id
     windows_overwrite_local_kube_config = var.windows_overwrite_local_kube_config
   }
 

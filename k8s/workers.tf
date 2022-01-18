@@ -2,7 +2,7 @@ resource "null_resource" "worker_setup" {
   count = length(var.workers)
 
   triggers = {
-    control_plane_init = null_resource.control_plane_setup.id # Workers will be init'ed after control-plane
+    control_plane_init = null_resource.copy_configs_from_control_plane.id # Workers will be init'ed after control-plane
 
     private_ip   = var.workers[count.index].private_ip
     hostname     = var.workers[count.index].hostname
