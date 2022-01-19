@@ -61,6 +61,28 @@ resource "oci_core_security_list" "public" {
       max = 6443
     }
   }
+  # kubelet API
+  ingress_security_rules {
+    stateless   = false
+    source      = "10.0.0.0/16" # vcn
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 10250
+      max = 10250
+    }
+  }
+  # flannel
+  ingress_security_rules {
+    stateless   = false
+    source      = "10.0.0.0/16" # vcn
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.UDP
+    udp_options {
+      min = 8472
+      max = 8472
+    }
+  }
   # HTTP
   ingress_security_rules {
     stateless   = false
@@ -72,6 +94,16 @@ resource "oci_core_security_list" "public" {
       max = 80
     }
   }
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0" # Internet
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 30080
+      max = 30080
+    }
+  }
   # HTTPS
   ingress_security_rules {
     stateless   = false
@@ -81,6 +113,16 @@ resource "oci_core_security_list" "public" {
     tcp_options {
       min = 443
       max = 443
+    }
+  }
+  ingress_security_rules {
+    stateless   = false
+    source      = "0.0.0.0/0" # Internet
+    source_type = "CIDR_BLOCK"
+    protocol    = local.protocol.TCP
+    tcp_options {
+      min = 30443
+      max = 30443
     }
   }
 }
