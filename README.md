@@ -1,8 +1,8 @@
 # K8s cluster on Oracle Cloud Always Free Infrastructure (with Terraform)
 
-#### This repo describes a way for provisioning free resources in the Oracle Cloud. Options are different for accounts in the Always Free tier and with a Pay-as-You-Go subscription. 
+__This repo describes a way for provisioning free resources in the Oracle Cloud. Options are different for accounts in the Always Free tier and with a Pay-as-You-Go subscription.__ 
 
-#### Scripts for the Always Free tier are in the [main](https://github.com/egorshulga/oci-always-free-k8s/tree/main) branch, scripts for Pay-as-You-Go are in the [free-pay-as-you-go](https://github.com/egorshulga/oci-always-free-k8s/tree/free-pay-as-you-go) branch. Options differences are described [here](https://github.com/egorshulga/oci-always-free-k8s#network-considerations-for-always-free-tier).
+__Scripts for the Always Free tier are in the [main](https://github.com/egorshulga/oci-always-free-k8s/tree/main) branch, scripts for Pay-as-You-Go are in the [free-pay-as-you-go](https://github.com/egorshulga/oci-always-free-k8s/tree/free-pay-as-you-go) branch. Options differences are described [here](https://github.com/egorshulga/oci-always-free-k8s#network-considerations-for-always-free-tier).__
 
 ## Getting started
 
