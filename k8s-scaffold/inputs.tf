@@ -17,8 +17,6 @@ variable "workers" {
   }))
 }
 
-variable "control_plane_setup" { type = string }
-
 variable "debug_create_cluster_admin" {
   type    = bool
   default = false

@@ -2,8 +2,7 @@ resource "null_resource" "worker_setup" {
   count = length(var.workers)
 
   triggers = {
-    control_plane_init              = null_resource.control_plane_setup.id # Workers will be init'ed after control-plane
-    copy_configs_from_control_plane = null_resource.copy_configs_from_control_plane.id
+    control_plane_init = null_resource.control_plane_setup.id # Workers will be init'ed after control-plane
 
     private_ip   = var.workers[count.index].private_ip
     hostname     = var.workers[count.index].hostname
@@ -33,15 +32,15 @@ resource "null_resource" "worker_setup" {
   }
   provisioner "remote-exec" { inline = ["chmod 0777 .kube/reset.sh"] }
   provisioner "file" {
-    source      = ".terraform/.kube/config-cluster"
+    content     = data.remote_file.kube_config_cluster.content
     destination = ".kube/config"
   }
   provisioner "file" {
-    source      = ".terraform/.kube/join-token"
+    content     = data.remote_file.kube_join_token.content
     destination = ".kube/join-token"
   }
   provisioner "file" {
-    source      = ".terraform/.kube/join-hash"
+    content     = data.remote_file.kube_join_hash.content
     destination = ".kube/join-hash"
   }
   provisioner "remote-exec" { inline = [file("${path.module}/scripts/update-upgrade.sh")] }

@@ -3,7 +3,6 @@ resource "null_resource" "admin" {
   depends_on = [null_resource.scaffold]
 
   triggers = {
-    control_plane_setup     = var.control_plane_setup
     vm_user                 = var.leader.vm_user
     cluster_public_ip       = var.cluster_public_ip
     cluster_public_dns_name = var.cluster_public_dns_name
@@ -42,9 +41,9 @@ data "remote_file" "admin_token" {
   count      = var.debug_create_cluster_admin ? 1 : 0
   depends_on = [null_resource.admin]
   conn {
-    user        = var.leader.vm_user
-    host        = var.cluster_public_ip
-    private_key = file(var.ssh_key_path)
+    user             = var.leader.vm_user
+    host             = var.cluster_public_ip
+    private_key_path = var.ssh_key_path
   }
   path = ".kube/admin-token"
 }

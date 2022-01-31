@@ -59,27 +59,53 @@ resource "null_resource" "control_plane_setup" {
   }
 }
 
-resource "null_resource" "copy_configs_from_control_plane" {
-  triggers = {
-    control_plane_setup = null_resource.control_plane_setup.id,
+data "remote_file" "kube_config_cluster" {
+  depends_on = [null_resource.control_plane_setup]
+  conn {
+    host             = var.cluster_public_ip
+    user             = var.leader.vm_user
+    private_key_path = var.ssh_key_path
   }
+  path = ".kube/config"
+}
+data "remote_file" "kube_config_external" {
+  depends_on = [null_resource.control_plane_setup]
+  conn {
+    host             = var.cluster_public_ip
+    user             = var.leader.vm_user
+    private_key_path = var.ssh_key_path
+  }
+  path = ".kube/config-external"
+}
+data "remote_file" "kube_join_token" {
+  depends_on = [null_resource.control_plane_setup]
+  conn {
+    host             = var.cluster_public_ip
+    user             = var.leader.vm_user
+    private_key_path = var.ssh_key_path
+  }
+  path = ".kube/join-token"
+}
+data "remote_file" "kube_join_hash" {
+  depends_on = [null_resource.control_plane_setup]
+  conn {
+    host             = var.cluster_public_ip
+    user             = var.leader.vm_user
+    private_key_path = var.ssh_key_path
+  }
+  path = ".kube/join-hash"
+}
 
-  provisioner "local-exec" {
-    command    = "mkdir .terraform\\.kube"
-    on_failure = continue
-  }
-  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config .terraform/.kube/config-cluster" }
-  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/config-external .terraform/.kube/config-external" }
-  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-token .terraform/.kube/join-token" }
-  provisioner "local-exec" { command = "scp -i ${var.ssh_key_path} -o StrictHostKeyChecking=off ${var.leader.vm_user}@${var.cluster_public_ip}:~/.kube/join-hash .terraform/.kube/join-hash" }
+resource "local_file" "kube_config" {
+  sensitive_content = data.remote_file.kube_config_external.content
+  filename          = ".terraform\\.kube\\config-external"
 }
 
 resource "null_resource" "save_kube_config" {
   triggers = {
-    copy_configs_from_control_plane     = null_resource.copy_configs_from_control_plane.id
+    external_kube_config                = local_file.kube_config.id
     windows_overwrite_local_kube_config = var.windows_overwrite_local_kube_config
   }
-
   provisioner "local-exec" {
     command = var.windows_overwrite_local_kube_config ? "copy /Y .terraform\\.kube\\config-external %USERPROFILE%\\.kube\\config" : "echo Kube config is available locally: .terraform/.kube/config-external"
   }
