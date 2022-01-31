@@ -414,3 +414,11 @@ Ingress connectivity is achieved via Network Load Balancer, which is available f
 This error means that Oracle has run out of free ARM compute resources in selected region.
 
 Possible workaround could be to switch to another availability domain for provisioning compute resources (see [main.tf](main.tf)), or to retry cluster provisioning in some days (as Oracle promises to deploy new capacity over time).
+
+### Invalid NLB state transition: from Updating to Updating
+
+![image](https://user-images.githubusercontent.com/6253488/151791718-263b692e-f89d-420d-8783-a82adb73adcb.png)
+
+That's a tricky error to debug, but my guess is that we create lots of resources under the Network Load Balancer (listeners, backend sets, backends). Oracle Cloud creates it sequentially one-by-one. And it appears that sometimes there could be a race condition happening on the Oracle's side (multiple NLB resources compete to be created), which results in the error.
+
+Workaround for this error is to manually retry `terraform apply` command once again. Terraform will continue resources provisioning from the point where it stopped.
