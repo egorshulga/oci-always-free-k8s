@@ -26,7 +26,7 @@ resource "null_resource" "admin" {
     destination = ".kube/admin-user.yaml"
   }
   provisioner "remote-exec" { inline = ["kubectl apply -f .kube/admin-user.yaml"] }
-  provisioner "remote-exec" { inline = ["kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath=\"{.secrets[0].name}\") -o go-template=\"{{.data.token | base64decode}}\" > .kube/admin-token"] }
+  provisioner "remote-exec" { inline = ["kubectl -n kubernetes-dashboard get secret admin-user-secret -o go-template=\"{{.data.token | base64decode}}\" > .kube/admin-token"] }
 
   provisioner "remote-exec" {
     when       = destroy
