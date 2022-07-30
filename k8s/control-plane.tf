@@ -98,7 +98,7 @@ data "remote_file" "kube_join_hash" {
 
 resource "local_file" "kube_config" {
   sensitive_content = data.remote_file.kube_config_external.content
-  filename          = ".terraform\\.kube\\config-external"
+  filename          = ".terraform/.kube/.config-external"
 }
 
 resource "null_resource" "save_kube_config" {
